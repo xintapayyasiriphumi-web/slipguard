@@ -3,207 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KBank Slip Shield</title>
+<title>KBank SlipShield — Sender Blur</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:      #06060f;
-  --bg2:     #0b0b1d;
-  --surface: #111128;
-  --surf2:   #191936;
-  --edge:    rgba(100,60,255,.15);
-  --edge2:   rgba(100,60,255,.30);
-  --v:       #6b38ff;
-  --v2:      #8b5cf6;
-  --v3:      #c4b5fd;
-  --glow:    rgba(107,56,255,.42);
-  --snow:    #ede9ff;
-  --mist:    #786fa8;
-  --fog:     #383460;
-  --jade:    #10b981;
-  --amber:   #f59e0b;
-  --r: 13px;
+:root{
+  --bg:#06060f;--bg2:#0b0b1d;--surf:#111128;--surf2:#191936;
+  --e:rgba(100,60,255,.15);--e2:rgba(100,60,255,.30);
+  --v:#6b38ff;--v2:#8b5cf6;--v3:#c4b5fd;
+  --glow:rgba(107,56,255,.42);--snow:#ede9ff;--mist:#786fa8;--fog:#383460;
+  --jade:#10b981;--amber:#f59e0b;--r:13px;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;
-  background: var(--bg); color: var(--snow); min-height: 100vh;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'IBM Plex Sans Thai',system-ui,sans-serif;
+  background:var(--bg);color:var(--snow);min-height:100vh;
   background-image:
-    radial-gradient(ellipse 60% 40% at 12% 0%, rgba(107,56,255,.10) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 30% at 88% 100%, rgba(139,92,246,.07) 0%, transparent 55%);
+    radial-gradient(ellipse 60% 40% at 12% 0%,rgba(107,56,255,.10) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 30% at 88% 100%,rgba(139,92,246,.07) 0%,transparent 55%);
 }
-body::after {
-  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
 }
-.wrap { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 0 26px; }
+.wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:0 26px}
 
-/* HEADER */
-header {
-  padding: 24px 0 20px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--edge);
+header{
+  padding:24px 0 20px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--e);
 }
-.brand { display: flex; align-items: center; gap: 11px; }
-.gem {
-  width: 36px; height: 36px; border-radius: 9px;
-  background: linear-gradient(135deg, var(--v), var(--v2));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; box-shadow: 0 0 20px var(--glow);
+.brand{display:flex;align-items:center;gap:11px}
+.gem{
+  width:36px;height:36px;border-radius:9px;
+  background:linear-gradient(135deg,var(--v),var(--v2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;box-shadow:0 0 20px var(--glow);
 }
-.brand-name { font-size: 1.2rem; font-weight: 700; letter-spacing: -.4px; }
-.brand-name span { color: var(--v3); }
-.chip {
-  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: 1.2px;
-  background: rgba(107,56,255,.12); border: 1px solid var(--edge2);
-  color: var(--v3); padding: 4px 11px; border-radius: 999px;
+.brand-name{font-size:1.2rem;font-weight:700;letter-spacing:-.4px}
+.brand-name span{color:var(--v3)}
+.chip{
+  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1.2px;
+  background:rgba(107,56,255,.12);border:1px solid var(--e2);
+  color:var(--v3);padding:4px 11px;border-radius:999px;
 }
 
-/* HERO */
-.hero { padding: 44px 0 32px; text-align: center; }
-.hero h1 {
-  font-size: clamp(1.8rem, 3.6vw, 2.8rem); font-weight: 700;
-  letter-spacing: -.5px; line-height: 1.12;
-}
-.hero h1 em { font-style: normal; color: var(--v3); }
-.hero p { color: var(--mist); margin-top: 12px; max-width: 500px; margin-inline: auto; font-size: .94rem; line-height: 1.7; }
-.tag-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-.tag {
-  font-size: .7rem; font-weight: 600; padding: 5px 13px; border-radius: 999px;
-  border: 1px solid var(--edge); background: var(--surface); color: var(--mist);
-}
-.tag.active { background: rgba(107,56,255,.15); border-color: var(--edge2); color: var(--v3); }
+.hero{padding:44px 0 32px;text-align:center}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.8rem);font-weight:700;letter-spacing:-.5px;line-height:1.12}
+.hero h1 em{font-style:normal;color:var(--v3)}
+.hero p{color:var(--mist);margin-top:12px;max-width:500px;margin-inline:auto;font-size:.94rem;line-height:1.7}
+.tag-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.tag{font-size:.7rem;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--e);background:var(--surf);color:var(--mist)}
+.tag.hi{background:rgba(107,56,255,.15);border-color:var(--e2);color:var(--v3)}
 
-/* OVERLAY CONFIG */
-.cfg-bar {
-  display: flex; align-items: center; gap: 13px; flex-wrap: wrap;
-  background: var(--surface); border: 1px solid var(--edge);
-  border-radius: var(--r); padding: 14px 20px; margin-bottom: 22px;
+.cfg-bar{
+  display:flex;align-items:center;gap:13px;flex-wrap:wrap;
+  background:var(--surf);border:1px solid var(--e);
+  border-radius:var(--r);padding:14px 20px;margin-bottom:22px;
 }
-.cfg-lbl { font-size: .74rem; font-weight: 600; color: var(--mist); letter-spacing: .5px; white-space: nowrap; }
-.ov-thumb {
-  width: 40px; height: 40px; border-radius: 7px; object-fit: cover;
-  border: 1px solid var(--edge2); background: var(--surf2); flex-shrink: 0;
+.cfg-lbl{font-size:.74rem;font-weight:600;color:var(--mist);letter-spacing:.5px;white-space:nowrap}
+.ov-thumb{width:40px;height:40px;border-radius:7px;object-fit:cover;border:1px solid var(--e2);background:var(--surf2);flex-shrink:0}
+.cfg-in{
+  flex:1;min-width:160px;background:var(--surf2);border:1px solid var(--e);
+  color:var(--snow);border-radius:7px;padding:9px 13px;
+  font-size:.8rem;font-family:'DM Mono',monospace;outline:none;transition:.18s;
 }
-.cfg-in {
-  flex: 1; min-width: 160px; background: var(--surf2); border: 1px solid var(--edge);
-  color: var(--snow); border-radius: 7px; padding: 9px 13px;
-  font-size: .8rem; font-family: 'DM Mono', monospace; outline: none; transition: .18s;
+.cfg-in:focus{border-color:var(--e2);box-shadow:0 0 0 3px rgba(107,56,255,.12)}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:8px;border:none;cursor:pointer;
+  font-family:'IBM Plex Sans Thai',sans-serif;font-size:.82rem;font-weight:600;transition:all .18s;
 }
-.cfg-in:focus { border-color: var(--edge2); box-shadow: 0 0 0 3px rgba(107,56,255,.12); }
-.btn {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer;
-  font-family: 'IBM Plex Sans Thai', sans-serif; font-size: .82rem; font-weight: 600;
-  transition: all .18s;
-}
-.btn-v  { background: var(--v); color: #fff; }
-.btn-v:hover { background: var(--v2); box-shadow: 0 0 16px var(--glow); }
-.btn-g  { background: linear-gradient(135deg, #059669, var(--jade)); color: #fff; }
-.btn-g:hover { box-shadow: 0 0 14px rgba(16,185,129,.4); }
-.btn-o  { background: var(--surf2); color: var(--mist); border: 1px solid var(--edge); }
-.btn-o:hover { color: var(--snow); border-color: var(--edge2); }
-.btn:disabled { opacity: .3; cursor: not-allowed; pointer-events: none; }
-label.btn { cursor: pointer; }
+.bv{background:var(--v);color:#fff}
+.bv:hover{background:var(--v2);box-shadow:0 0 16px var(--glow)}
+.bg{background:linear-gradient(135deg,#059669,var(--jade));color:#fff}
+.bg:hover{box-shadow:0 0 14px rgba(16,185,129,.4)}
+.bo{background:var(--surf2);color:var(--mist);border:1px solid var(--e)}
+.bo:hover{color:var(--snow);border-color:var(--e2)}
+.btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+label.btn{cursor:pointer}
 
-/* DROP ZONE */
-#drop {
-  border: 2px dashed var(--edge2); border-radius: 18px;
-  padding: 58px 40px; text-align: center; cursor: pointer;
-  background: var(--bg2); position: relative; overflow: hidden;
-  transition: all .22s; margin-bottom: 24px;
+#drop{
+  border:2px dashed var(--e2);border-radius:18px;
+  padding:58px 40px;text-align:center;cursor:pointer;
+  background:var(--bg2);position:relative;overflow:hidden;
+  transition:all .22s;margin-bottom:24px;
 }
-#drop::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(circle at 50% 55%, rgba(107,56,255,.055), transparent 65%);
+#drop::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 55%,rgba(107,56,255,.055),transparent 65%);
 }
-#drop:hover, #drop.over {
-  border-color: var(--v2); background: rgba(107,56,255,.07);
-  box-shadow: 0 0 40px rgba(107,56,255,.12);
+#drop:hover,#drop.over{border-color:var(--v2);background:rgba(107,56,255,.07);box-shadow:0 0 40px rgba(107,56,255,.12)}
+.di{font-size:2.8rem;margin-bottom:14px;opacity:.7}
+.dh{font-size:1.15rem;font-weight:700}
+.ds{color:var(--mist);font-size:.875rem;margin-top:7px}
+.fmts{display:flex;gap:8px;justify-content:center;margin-top:15px}
+.fmt{font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:1px;background:var(--surf);border:1px solid var(--e);color:var(--mist);padding:3px 10px;border-radius:5px}
+.btn-br{
+  display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+  background:linear-gradient(135deg,var(--v),var(--v2));
+  color:#fff;border:none;border-radius:999px;padding:11px 28px;
+  font-size:.87rem;font-weight:700;font-family:'IBM Plex Sans Thai',sans-serif;
+  cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(107,56,255,.36);
 }
-.drop-icon { font-size: 2.8rem; margin-bottom: 14px; opacity: .7; }
-.drop-h { font-size: 1.15rem; font-weight: 700; }
-.drop-s { color: var(--mist); font-size: .875rem; margin-top: 7px; }
-.fmts { display: flex; gap: 8px; justify-content: center; margin-top: 15px; }
-.fmt {
-  font-family: 'DM Mono', monospace; font-size: .67rem; letter-spacing: 1px;
-  background: var(--surface); border: 1px solid var(--edge);
-  color: var(--mist); padding: 3px 10px; border-radius: 5px;
-}
-.btn-browse {
-  display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
-  background: linear-gradient(135deg, var(--v), var(--v2));
-  color: #fff; border: none; border-radius: 999px; padding: 11px 28px;
-  font-size: .87rem; font-weight: 700; font-family: 'IBM Plex Sans Thai', sans-serif;
-  cursor: pointer; transition: all .2s; box-shadow: 0 4px 20px rgba(107,56,255,.36);
-}
-.btn-browse:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(107,56,255,.48); }
-#file-in { display: none; }
+.btn-br:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(107,56,255,.48)}
+#file-in{display:none}
 
-/* STATUS */
-#status {
-  display: none; align-items: center; gap: 11px;
-  padding: 12px 17px; border-radius: 9px; margin-bottom: 18px;
-  font-size: .83rem; border: 1px solid;
+#status{
+  display:none;align-items:center;gap:11px;
+  padding:12px 17px;border-radius:9px;margin-bottom:18px;
+  font-size:.83rem;border:1px solid;
 }
-#status.proc { background: rgba(107,56,255,.08); border-color: var(--edge2); color: var(--v3); }
-#status.ok   { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.28); color: var(--jade); }
-#status.warn { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.28); color: var(--amber); }
+#status.ok{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.28);color:var(--jade)}
+#status.warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.28);color:var(--amber)}
 
-/* CANVAS AREA */
-#canvas-area { display: none; gap: 18px; margin-bottom: 24px; }
-.panel {
-  flex: 1; min-width: 0; background: var(--bg2);
-  border: 1px solid var(--edge); border-radius: var(--r);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.phead {
-  padding: 11px 16px; border-bottom: 1px solid var(--edge);
-  background: var(--surface); display: flex; align-items: center; justify-content: space-between;
-}
-.ptitle {
-  font-size: .71rem; font-weight: 700; letter-spacing: .9px;
-  text-transform: uppercase; color: var(--mist);
-  display: flex; align-items: center; gap: 7px;
-}
-.dot { width: 7px; height: 7px; border-radius: 50%; }
-.db { background: #3b82f6; } .dp { background: var(--v2); }
-.cw {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  padding: 14px; min-height: 200px;
-}
-.cw canvas { max-width: 100%; max-height: 560px; border-radius: 7px; display: block; }
+#info-box{display:none;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.ic{background:var(--surf);border:1px solid var(--e);border-radius:9px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+.il{font-size:.68rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mist)}
+.iv{font-family:'DM Mono',monospace;font-size:.86rem;color:var(--snow)}
+.iv.g{color:var(--jade)}.iv.p{color:var(--v3)}.iv.a{color:var(--amber)}
+.zt{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;color:var(--mist);cursor:pointer;user-select:none;margin-left:auto}
+.zt input{accent-color:var(--v2);cursor:pointer}
+.zt:hover{color:var(--snow)}
 
-/* INFO BOX */
-#info-box {
-  display: none; gap: 14px; flex-wrap: wrap;
-  margin-bottom: 18px;
-}
-.info-card {
-  background: var(--surface); border: 1px solid var(--edge);
-  border-radius: 9px; padding: 12px 16px;
-  display: flex; flex-direction: column; gap: 4px;
-}
-.info-lbl { font-size: .68rem; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--mist); }
-.info-val { font-family: 'DM Mono', monospace; font-size: .88rem; color: var(--snow); }
-.info-val.g { color: var(--jade); }
-.info-val.p { color: var(--v3); }
+#canvas-area{display:none;gap:18px;margin-bottom:24px}
+.panel{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--e);border-radius:var(--r);display:flex;flex-direction:column;overflow:hidden}
+.ph{padding:11px 16px;border-bottom:1px solid var(--e);background:var(--surf);display:flex;align-items:center;justify-content:space-between}
+.pt{font-size:.71rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mist);display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%}
+.db{background:#3b82f6}.dp{background:var(--v2)}
+.cw{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;min-height:200px}
+.cw canvas{max-width:100%;max-height:560px;border-radius:7px;display:block}
 
-/* ACTIONS */
-#actions { display: none; gap: 10px; margin-bottom: 36px; flex-wrap: wrap; }
+#actions{display:none;gap:10px;margin-bottom:36px;flex-wrap:wrap}
 
-/* ZONE OVERLAY TOGGLE */
-.zone-toggle {
-  display: inline-flex; align-items: center; gap: 7px;
-  font-size: .8rem; color: var(--mist); cursor: pointer; user-select: none;
-}
-.zone-toggle input { accent-color: var(--v2); cursor: pointer; }
-.zone-toggle:hover { color: var(--snow); }
-
-@media (max-width: 720px) { #canvas-area { flex-direction: column; } }
-
-.fi { animation: fi .35s ease forwards; }
-@keyframes fi { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media(max-width:720px){#canvas-area{flex-direction:column}}
+.fi{animation:fi .35s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -214,17 +148,18 @@ label.btn { cursor: pointer; }
     <div class="gem">🛡️</div>
     <div class="brand-name">KBank <span>SlipShield</span></div>
   </div>
-  <span class="chip">FIXED-LAYOUT · NO OCR</span>
+  <span class="chip">SENDER BLUR · NO OCR</span>
 </header>
 
 <section class="hero">
-  <h1>Redact KBank <em>Transfer Slips</em></h1>
-  <p>เบลอชื่อผู้รับเงินและแทนที่ QR code ด้วย layout-based positioning — ไม่ใช้ OCR ทำงานใน browser ทั้งหมด</p>
+  <h1>เบลอชื่อ<em>ผู้โอน</em> KBank Slip</h1>
+  <p>ใช้ fixed layout positioning — เบลอเฉพาะชื่อผู้โอน (ผู้โอน) และแทนที่ QR code ด้วยโลโก้ของคุณ ไม่ใช้ OCR ทำงานใน browser ทั้งหมด</p>
   <div class="tag-row">
-    <span class="tag active">🟩 KBank / K PLUS</span>
+    <span class="tag hi">🟩 KBank / K PLUS</span>
+    <span class="tag hi">เบลอ: ผู้โอน</span>
+    <span class="tag">ไม่แตะ: ผู้รับ</span>
     <span class="tag">Fixed Layout</span>
     <span class="tag">No OCR</span>
-    <span class="tag">Canvas API</span>
   </div>
 </section>
 
@@ -233,63 +168,42 @@ label.btn { cursor: pointer; }
   <span class="cfg-lbl">QR OVERLAY IMAGE</span>
   <img id="ov-thumb" class="ov-thumb" src="" alt="">
   <input id="ov-url" class="cfg-in" type="text" placeholder="Paste image URL…">
-  <label class="btn btn-o">📁 Local File <input type="file" id="ov-file" accept="image/*" style="display:none"></label>
-  <button class="btn btn-v" id="ov-apply">Apply</button>
+  <label class="btn bo">📁 Local File <input type="file" id="ov-file" accept="image/*" style="display:none"></label>
+  <button class="btn bv" id="ov-apply">Apply</button>
 </div>
 
 <!-- DROP ZONE -->
 <div id="drop">
-  <div class="drop-icon">🧾</div>
-  <div class="drop-h">วาง KBank slip ที่นี่</div>
-  <div class="drop-s">หรือคลิกเพื่อเลือกไฟล์</div>
-  <div class="fmts">
-    <span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span>
-  </div>
-  <button class="btn-browse" id="browse-btn">📂 เลือกไฟล์</button>
+  <div class="di">🧾</div>
+  <div class="dh">วาง KBank slip ที่นี่</div>
+  <div class="ds">หรือคลิกเพื่อเลือกไฟล์</div>
+  <div class="fmts"><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span></div>
+  <button class="btn-br" id="browse-btn">📂 เลือกไฟล์</button>
   <input type="file" id="file-in" accept="image/jpeg,image/png,image/webp">
 </div>
 
 <!-- STATUS -->
-<div id="status">
-  <span id="s-icon"></span>
-  <span id="s-txt"></span>
-</div>
+<div id="status"><span id="s-txt"></span></div>
 
-<!-- INFO BOX -->
+<!-- INFO CARDS -->
 <div id="info-box">
-  <div class="info-card">
-    <span class="info-lbl">Image Size</span>
-    <span class="info-val" id="inf-size">—</span>
-  </div>
-  <div class="info-card">
-    <span class="info-lbl">Receiver Zone</span>
-    <span class="info-val p" id="inf-recv">—</span>
-  </div>
-  <div class="info-card">
-    <span class="info-lbl">QR Zone</span>
-    <span class="info-val p" id="inf-qr">—</span>
-  </div>
-  <div class="info-card">
-    <span class="info-lbl">Status</span>
-    <span class="info-val g" id="inf-status">—</span>
-  </div>
-  <label class="zone-toggle" style="margin-left:auto">
-    <input type="checkbox" id="show-zones"> Show zones
-  </label>
+  <div class="ic"><span class="il">Image Size</span><span class="iv" id="inf-sz">—</span></div>
+  <div class="ic"><span class="il">Sender Zone (BLURRED)</span><span class="iv a" id="inf-snd">—</span></div>
+  <div class="ic"><span class="il">QR Zone (OVERLAY)</span><span class="iv p" id="inf-qr">—</span></div>
+  <div class="ic"><span class="il">Receiver Zone</span><span class="iv g" id="inf-rcv">NOT TOUCHED ✓</span></div>
+  <label class="zt"><input type="checkbox" id="show-zones"> Show zones</label>
 </div>
 
 <!-- CANVAS AREA -->
 <div id="canvas-area">
   <div class="panel">
-    <div class="phead">
-      <span class="ptitle"><span class="dot db"></span>ต้นฉบับ (Original)</span>
-    </div>
+    <div class="ph"><span class="pt"><span class="dot db"></span>ต้นฉบับ (Original)</span></div>
     <div class="cw"><canvas id="orig-c"></canvas></div>
   </div>
   <div class="panel">
-    <div class="phead">
-      <span class="ptitle"><span class="dot dp"></span>ประมวลผลแล้ว (Processed)</span>
-      <span style="font-size:.67rem;color:var(--fog);font-family:'DM Mono',monospace">ผู้รับเงินถูกเบลอ • QR ถูกแทนที่</span>
+    <div class="ph">
+      <span class="pt"><span class="dot dp"></span>ประมวลผลแล้ว (Processed)</span>
+      <span style="font-size:.67rem;color:var(--fog);font-family:'DM Mono',monospace">ผู้โอนถูกเบลอ • QR ถูกแทนที่ • ผู้รับไม่ถูกแตะ</span>
     </div>
     <div class="cw"><canvas id="out-c"></canvas></div>
   </div>
@@ -297,77 +211,60 @@ label.btn { cursor: pointer; }
 
 <!-- ACTIONS -->
 <div id="actions">
-  <button class="btn btn-g" id="dl-btn" disabled>⬇ ดาวน์โหลด PNG</button>
-  <button class="btn btn-o" id="reset-btn">✕ เริ่มใหม่</button>
+  <button class="btn bg" id="dl-btn" disabled>⬇ ดาวน์โหลด PNG</button>
+  <button class="btn bo" id="reset-btn">✕ เริ่มใหม่</button>
 </div>
 
-</div><!-- /wrap -->
-
+</div>
 <script>
-/* ═══════════════════════════════════════════════
-   KBANK SLIP LAYOUT — FIXED PERCENTAGES
-   Based on standard KBank / K PLUS slip structure
-═══════════════════════════════════════════════ */
+/* ════════════════════════════════════════════
+   LAYOUT — KBank fixed percentages
+   BLUR:    sender (ผู้โอน) only
+   OVERLAY: QR code bottom-right
+   UNTOUCHED: receiver (ผู้รับ), all other areas
+════════════════════════════════════════════ */
 const LAYOUT = {
-  receiver: {
-    x: 0.20,   // 20% from left
-    y: 0.455,  // 45.5% from top  ← receiver name sits here (below arrow)
-    w: 0.60,   // 60% wide
-    h: 0.065,  // 6.5% tall
-  },
-  qr: {
-    x: 0.62,   // 62% from left
-    y: 0.595,  // 59.5% from top
-    w: 0.30,   // 30% wide
-    h: 0.30,   // 30% tall (square)
-  },
+  sender: { xP:.20, yP:.18, wP:.55, hP:.10 },
+  qr:     { xP:.68, yP:.60, wP:.25, hP:.25 },
 };
 
-/* ═══════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════ */
-let overlayImg  = null;
-let currentImg  = null;
-let showZones   = false;
+/* ────── STATE ────── */
+let overlayImg = null;
+let currentImg = null;
+let showZones  = false;
 
-/* ═══════════════════════════════════════════════
-   ELEMENTS
-═══════════════════════════════════════════════ */
-const drop      = document.getElementById('drop');
-const fileIn    = document.getElementById('file-in');
-const browseBtn = document.getElementById('browse-btn');
-const statusEl  = document.getElementById('status');
-const sTxt      = document.getElementById('s-txt');
-const sIcon     = document.getElementById('s-icon');
-const caArea    = document.getElementById('canvas-area');
-const origC     = document.getElementById('orig-c');
-const outC      = document.getElementById('out-c');
-const origX     = origC.getContext('2d');
-const outX      = outC.getContext('2d');
-const infoBox   = document.getElementById('info-box');
-const actions   = document.getElementById('actions');
-const dlBtn     = document.getElementById('dl-btn');
-const resetBtn  = document.getElementById('reset-btn');
-const ovThumb   = document.getElementById('ov-thumb');
-const ovUrl     = document.getElementById('ov-url');
-const ovFile    = document.getElementById('ov-file');
-const ovApply   = document.getElementById('ov-apply');
-const showZonesChk = document.getElementById('show-zones');
-const infSize   = document.getElementById('inf-size');
-const infRecv   = document.getElementById('inf-recv');
-const infQR     = document.getElementById('inf-qr');
-const infStatus = document.getElementById('inf-status');
+/* ────── ELEMENTS ────── */
+const drop     = document.getElementById('drop');
+const fileIn   = document.getElementById('file-in');
+const browseBtn= document.getElementById('browse-btn');
+const statusEl = document.getElementById('status');
+const sTxt     = document.getElementById('s-txt');
+const caArea   = document.getElementById('canvas-area');
+const origC    = document.getElementById('orig-c');
+const outC     = document.getElementById('out-c');
+const origX    = origC.getContext('2d');
+const outX     = outC.getContext('2d');
+const infoBox  = document.getElementById('info-box');
+const actions  = document.getElementById('actions');
+const dlBtn    = document.getElementById('dl-btn');
+const resetBtn = document.getElementById('reset-btn');
+const ovThumb  = document.getElementById('ov-thumb');
+const ovUrl    = document.getElementById('ov-url');
+const ovFile   = document.getElementById('ov-file');
+const ovApply  = document.getElementById('ov-apply');
+const zonesChk = document.getElementById('show-zones');
+const infSz    = document.getElementById('inf-sz');
+const infSnd   = document.getElementById('inf-snd');
+const infQR    = document.getElementById('inf-qr');
 
-/* ═══════════════════════════════════════════════
-   OVERLAY IMAGE SETUP
-═══════════════════════════════════════════════ */
+/* ────── OVERLAY SETUP ────── */
 function loadOverlay(src) {
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.onload = () => { overlayImg = img; ovThumb.src = img.src; if (currentImg) render(); };
   img.onerror = () => {
-    /* fallback: purple circle with IX */
-    const fc = document.createElement('canvas'); fc.width = fc.height = 200;
+    const fc = document.createElement('canvas');
+    fc.width = fc.height = 200;
     const fx = fc.getContext('2d');
     fx.fillStyle = '#6b38ff';
     fx.beginPath(); fx.arc(100,100,100,0,Math.PI*2); fx.fill();
@@ -380,15 +277,14 @@ function loadOverlay(src) {
   img.src = src;
 }
 
-/* Try loading INSIDEX logo first, fallback to placeholder */
 (async () => {
   try {
     const r = await fetch('/mnt/user-data/uploads/412.png');
     if (!r.ok) throw 0;
     const blob = await r.blob();
-    const reader = new FileReader();
-    reader.onload = e => { loadOverlay(e.target.result); ovUrl.value = '(INSIDEX logo)'; };
-    reader.readAsDataURL(blob);
+    const rd = new FileReader();
+    rd.onload = e => { loadOverlay(e.target.result); ovUrl.value = '(INSIDEX logo)'; };
+    rd.readAsDataURL(blob);
   } catch {
     loadOverlay('https://via.placeholder.com/150/6b38ff/ffffff?text=IX');
   }
@@ -406,9 +302,7 @@ ovFile.addEventListener('change', () => {
   r.readAsDataURL(f);
 });
 
-/* ═══════════════════════════════════════════════
-   DRAG & DROP / FILE PICKER
-═══════════════════════════════════════════════ */
+/* ────── DRAG & DROP ────── */
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', e => {
@@ -420,16 +314,17 @@ drop.addEventListener('click', () => fileIn.click());
 browseBtn.addEventListener('click', e => { e.stopPropagation(); fileIn.click(); });
 fileIn.addEventListener('change', () => { if (fileIn.files[0]) loadSlip(fileIn.files[0]); });
 
-/* ═══════════════════════════════════════════════
-   LOAD SLIP
-═══════════════════════════════════════════════ */
+/* ────── LOAD ────── */
 function loadSlip(file) {
   const r = new FileReader();
   r.onload = e => {
     const img = new Image();
     img.onload = () => {
       currentImg = img;
-      setupCanvases(img);
+      const W = img.naturalWidth, H = img.naturalHeight;
+      origC.width = outC.width = W;
+      origC.height = outC.height = H;
+      origX.drawImage(img, 0, 0);
       render();
       showUI();
     };
@@ -438,225 +333,155 @@ function loadSlip(file) {
   r.readAsDataURL(file);
 }
 
-function setupCanvases(img) {
-  const W = img.naturalWidth, H = img.naturalHeight;
-  origC.width = outC.width = W;
-  origC.height = outC.height = H;
-  origX.drawImage(img, 0, 0);
-}
-
-/* ═══════════════════════════════════════════════
-   COMPUTE LAYOUT RECTS  (all clamped to canvas bounds)
-═══════════════════════════════════════════════ */
-function getReceiverRect(W, H) {
-  const x = Math.round(clamp(LAYOUT.receiver.x * W, 0, W));
-  const y = Math.round(clamp(LAYOUT.receiver.y * H, 0, H));
-  const w = Math.round(clamp(LAYOUT.receiver.w * W, 1, W - x));
-  const h = Math.round(clamp(LAYOUT.receiver.h * H, 1, H - y));
-  return { x, y, w, h };
-}
-
-function getQRRect(W, H) {
-  const x = Math.round(clamp(LAYOUT.qr.x * W, 0, W));
-  const y = Math.round(clamp(LAYOUT.qr.y * H, 0, H));
-  const w = Math.round(clamp(LAYOUT.qr.w * W, 1, W - x));
-  const h = Math.round(clamp(LAYOUT.qr.h * H, 1, H - y));
-  return { x, y, w, h };
-}
-
+/* ────── RECTS ────── */
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-/* ═══════════════════════════════════════════════
-   RENDER PROCESSED IMAGE
-═══════════════════════════════════════════════ */
+function senderRect(W, H) {
+  const x = Math.round(clamp(LAYOUT.sender.xP * W, 0, W));
+  const y = Math.round(clamp(LAYOUT.sender.yP * H, 0, H));
+  const w = Math.round(clamp(LAYOUT.sender.wP * W, 1, W - x));
+  const h = Math.round(clamp(LAYOUT.sender.hP * H, 1, H - y));
+  return { x, y, w, h };
+}
+
+function qrRect(W, H) {
+  const x = Math.round(clamp(LAYOUT.qr.xP * W, 0, W));
+  const y = Math.round(clamp(LAYOUT.qr.yP * H, 0, H));
+  const w = Math.round(clamp(LAYOUT.qr.wP * W, 1, W - x));
+  const h = Math.round(clamp(LAYOUT.qr.hP * H, 1, H - y));
+  return { x, y, w, h };
+}
+
+/* ────── RENDER ────── */
 function render() {
   if (!currentImg) return;
   const W = currentImg.naturalWidth, H = currentImg.naturalHeight;
-
-  /* fresh draw */
   outX.drawImage(currentImg, 0, 0);
 
-  const recv = getReceiverRect(W, H);
-  const qr   = getQRRect(W, H);
+  const snd = senderRect(W, H);
+  const qr  = qrRect(W, H);
 
-  /* ── 1. Blur receiver name ── */
-  blurRect(outX, recv.x, recv.y, recv.w, recv.h, 24);
+  /* BLUR sender only */
+  blurRect(outX, snd.x, snd.y, snd.w, snd.h, 26);
 
-  /* ── 2. QR overlay ── */
+  /* QR overlay — no blur */
   drawQROverlay(outX, qr);
 
-  /* ── 3. Optional zone outlines for debugging ── */
+  /* optional zone outlines */
   if (showZones) {
-    drawZoneOutline(outX, recv, '#f59e0b', 'RECEIVER');
-    drawZoneOutline(outX, qr,  '#3b82f6', 'QR');
+    outline(outX, snd, '#f59e0b', 'ผู้โอน (BLURRED)');
+    outline(outX, qr,  '#3b82f6', 'QR (OVERLAY)');
   }
 
-  /* Update info cards */
-  infSize.textContent  = `${W} × ${H} px`;
-  infRecv.textContent  = `(${recv.x}, ${recv.y}) ${recv.w}×${recv.h}`;
-  infQR.textContent    = `(${qr.x}, ${qr.y}) ${qr.w}×${qr.h}`;
-  infStatus.textContent = '✅ Processed';
+  /* info */
+  infSz.textContent  = `${W} × ${H} px`;
+  infSnd.textContent = `(${snd.x}, ${snd.y}) ${snd.w}×${snd.h}`;
+  infQR.textContent  = `(${qr.x}, ${qr.y}) ${qr.w}×${qr.h}`;
 }
 
-/* ═══════════════════════════════════════════════
-   BLUR — triple-pass box blur (smooth, high quality)
-═══════════════════════════════════════════════ */
+/* ────── TRIPLE-PASS BOX BLUR ────── */
 function blurRect(ctx, x, y, w, h, rad) {
-  x = Math.max(0, x); y = Math.max(0, y);
-  w = Math.min(ctx.canvas.width  - x, w);
-  h = Math.min(ctx.canvas.height - y, h);
+  x = Math.max(0, Math.round(x)); y = Math.max(0, Math.round(y));
+  w = Math.min(ctx.canvas.width  - x, Math.round(w));
+  h = Math.min(ctx.canvas.height - y, Math.round(h));
   if (w <= 0 || h <= 0) return;
-
   const id = ctx.getImageData(x, y, w, h);
-  boxBlurPass(id, rad);
-  boxBlurPass(id, rad);
-  boxBlurPass(id, Math.round(rad * 0.7));
+  pass(id, rad); pass(id, rad); pass(id, Math.round(rad * .65));
   ctx.putImageData(id, x, y);
 }
 
-function boxBlurPass(id, rad) {
-  const { data: d, width: W, height: H } = id;
-  const r2 = rad * 2 + 1;
+function pass(id, rad) {
+  const { data:d, width:W, height:H } = id;
+  const r2 = rad*2+1;
   const buf = new Uint8ClampedArray(d.length);
-
-  /* horizontal */
-  for (let row = 0; row < H; row++) {
-    let rs = 0, gs = 0, bs = 0, as = 0;
-    const rb = row * W * 4;
-    for (let k = -rad; k <= rad; k++) {
-      const c = clamp(k, 0, W - 1) * 4 + rb;
-      rs += d[c]; gs += d[c+1]; bs += d[c+2]; as += d[c+3];
-    }
-    for (let col = 0; col < W; col++) {
-      const i = rb + col * 4;
-      buf[i] = rs/r2; buf[i+1] = gs/r2; buf[i+2] = bs/r2; buf[i+3] = as/r2;
-      const ai = rb + clamp(col + rad + 1, 0, W-1) * 4;
-      const ri = rb + clamp(col - rad,     0, W-1) * 4;
-      rs += d[ai] - d[ri]; gs += d[ai+1] - d[ri+1];
-      bs += d[ai+2] - d[ri+2]; as += d[ai+3] - d[ri+3];
+  for (let row=0;row<H;row++){
+    let rs=0,gs=0,bs=0,as=0; const rb=row*W*4;
+    for(let k=-rad;k<=rad;k++){const c=clamp(k,0,W-1)*4+rb;rs+=d[c];gs+=d[c+1];bs+=d[c+2];as+=d[c+3];}
+    for(let col=0;col<W;col++){
+      const i=rb+col*4;buf[i]=rs/r2;buf[i+1]=gs/r2;buf[i+2]=bs/r2;buf[i+3]=as/r2;
+      const ai=rb+clamp(col+rad+1,0,W-1)*4,ri=rb+clamp(col-rad,0,W-1)*4;
+      rs+=d[ai]-d[ri];gs+=d[ai+1]-d[ri+1];bs+=d[ai+2]-d[ri+2];as+=d[ai+3]-d[ri+3];
     }
   }
-
-  /* vertical */
-  for (let col = 0; col < W; col++) {
-    let rs = 0, gs = 0, bs = 0, as = 0;
-    for (let k = -rad; k <= rad; k++) {
-      const r = clamp(k, 0, H - 1);
-      const i = (r * W + col) * 4;
-      rs += buf[i]; gs += buf[i+1]; bs += buf[i+2]; as += buf[i+3];
-    }
-    for (let row = 0; row < H; row++) {
-      const i = (row * W + col) * 4;
-      d[i] = rs/r2; d[i+1] = gs/r2; d[i+2] = bs/r2; d[i+3] = as/r2;
-      const ai = (clamp(row + rad + 1, 0, H-1) * W + col) * 4;
-      const ri = (clamp(row - rad,     0, H-1) * W + col) * 4;
-      rs += buf[ai] - buf[ri]; gs += buf[ai+1] - buf[ri+1];
-      bs += buf[ai+2] - buf[ri+2]; as += buf[ai+3] - buf[ri+3];
+  for(let col=0;col<W;col++){
+    let rs=0,gs=0,bs=0,as=0;
+    for(let k=-rad;k<=rad;k++){const r=clamp(k,0,H-1);const i=(r*W+col)*4;rs+=buf[i];gs+=buf[i+1];bs+=buf[i+2];as+=buf[i+3];}
+    for(let row=0;row<H;row++){
+      const i=(row*W+col)*4;d[i]=rs/r2;d[i+1]=gs/r2;d[i+2]=bs/r2;d[i+3]=as/r2;
+      const ai=(clamp(row+rad+1,0,H-1)*W+col)*4,ri=(clamp(row-rad,0,H-1)*W+col)*4;
+      rs+=buf[ai]-buf[ri];gs+=buf[ai+1]-buf[ri+1];bs+=buf[ai+2]-buf[ri+2];as+=buf[ai+3]-buf[ri+3];
     }
   }
 }
 
-/* ═══════════════════════════════════════════════
-   QR OVERLAY
-═══════════════════════════════════════════════ */
+/* ────── QR OVERLAY ────── */
 function drawQROverlay(ctx, qr) {
-  const PAD  = 0.08;
-  const ox   = qr.x + qr.w * PAD;
-  const oy   = qr.y + qr.h * PAD;
-  const ow   = qr.w * (1 - PAD * 2);
-  const oh   = qr.h * (1 - PAD * 2);
-  const cx   = ox + ow / 2;
-  const cy   = oy + oh / 2;
-  const cr   = Math.min(ow, oh) / 2;
+  const PAD=.08, SCALE=.85;
+  const ox=qr.x+qr.w*PAD, oy=qr.y+qr.h*PAD;
+  const ow=qr.w*(1-PAD*2), oh=qr.h*(1-PAD*2);
+  const cx=ox+ow/2, cy=oy+oh/2, cr=Math.min(ow,oh)/2;
 
-  /* white circle background */
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,cr,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fill();
   ctx.restore();
 
   if (overlayImg) {
-    const SCALE = 0.82; // 82% of QR inner area
-    const ar = overlayImg.naturalWidth / overlayImg.naturalHeight;
-    let dw = ow * SCALE, dh = oh * SCALE;
-    if (dw / dh > ar) dw = dh * ar; else dh = dw / ar;
-    const dx = clamp(cx - dw / 2, qr.x, qr.x + qr.w - dw);
-    const dy = clamp(cy - dh / 2, qr.y, qr.y + qr.h - dh);
-    ctx.drawImage(overlayImg, dx, dy, dw, dh);
+    const ar=overlayImg.naturalWidth/overlayImg.naturalHeight;
+    let dw=ow*SCALE, dh=oh*SCALE;
+    if(dw/dh>ar) dw=dh*ar; else dh=dw/ar;
+    const dx=clamp(cx-dw/2,qr.x,qr.x+qr.w-dw);
+    const dy=clamp(cy-dh/2,qr.y,qr.y+qr.h-dh);
+    ctx.drawImage(overlayImg,dx,dy,dw,dh);
   } else {
-    ctx.fillStyle = '#6b38ff';
-    ctx.font = `bold ${Math.round(oh * 0.32)}px sans-serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('IX', cx, cy);
+    ctx.fillStyle='#6b38ff';
+    ctx.font=`bold ${Math.round(oh*.32)}px sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('IX',cx,cy);
   }
 }
 
-/* ═══════════════════════════════════════════════
-   ZONE DEBUG OUTLINE
-═══════════════════════════════════════════════ */
-function drawZoneOutline(ctx, r, color, label) {
+/* ────── ZONE OUTLINE ────── */
+function outline(ctx, r, color, label) {
   ctx.save();
-  ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, r.w * 0.008);
-  ctx.setLineDash([8, 4]);
-  ctx.strokeRect(r.x, r.y, r.w, r.h);
-  ctx.setLineDash([]);
-  ctx.fillStyle = color;
-  ctx.font = `bold ${Math.max(12, Math.round(r.h * 0.35))}px sans-serif`;
-  ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
-  ctx.globalAlpha = 0.85;
-  ctx.fillText(label, r.x + 4, r.y - 4);
+  ctx.strokeStyle=color; ctx.lineWidth=Math.max(2,r.h*.04);
+  ctx.setLineDash([8,4]); ctx.strokeRect(r.x,r.y,r.w,r.h); ctx.setLineDash([]);
+  ctx.fillStyle=color; ctx.globalAlpha=.9;
+  ctx.font=`bold ${Math.max(11,Math.round(r.h*.28))}px sans-serif`;
+  ctx.textAlign='left'; ctx.textBaseline='bottom';
+  ctx.fillText(label,r.x+4,r.y-3);
   ctx.restore();
 }
 
-/* ═══════════════════════════════════════════════
-   SHOW UI
-═══════════════════════════════════════════════ */
+/* ────── SHOW UI ────── */
 function showUI() {
-  drop.style.display = 'none';
-  caArea.style.display = 'flex'; caArea.classList.add('fi');
-  infoBox.style.display = 'flex'; infoBox.classList.add('fi');
-  actions.style.display = 'flex';
-  dlBtn.disabled = false;
-  setStatus('ok', '✅ ประมวลผลเสร็จสิ้น — ชื่อผู้รับเงินถูกเบลอ, QR ถูกแทนที่');
+  drop.style.display='none';
+  caArea.style.display='flex'; caArea.classList.add('fi');
+  infoBox.style.display='flex'; infoBox.classList.add('fi');
+  actions.style.display='flex';
+  dlBtn.disabled=false;
+  statusEl.style.display='flex'; statusEl.className='ok';
+  sTxt.textContent='✅ เสร็จสิ้น — ชื่อผู้โอนถูกเบลอ, QR ถูกแทนที่, ชื่อผู้รับไม่ถูกแตะ';
 }
 
-function setStatus(type, msg) {
-  statusEl.style.display = 'flex';
-  statusEl.className = type;
-  sTxt.textContent = msg;
-}
+/* ────── ZONE TOGGLE ────── */
+zonesChk.addEventListener('change', () => { showZones=zonesChk.checked; if(currentImg) render(); });
 
-/* ═══════════════════════════════════════════════
-   ZONE TOGGLE
-═══════════════════════════════════════════════ */
-showZonesChk.addEventListener('change', () => {
-  showZones = showZonesChk.checked;
-  if (currentImg) render();
-});
-
-/* ═══════════════════════════════════════════════
-   DOWNLOAD / RESET
-═══════════════════════════════════════════════ */
+/* ────── DOWNLOAD / RESET ────── */
 dlBtn.addEventListener('click', () => {
-  const a = document.createElement('a');
-  a.download = 'kbank_slip_processed.png';
-  a.href = outC.toDataURL('image/png');
-  a.click();
+  const a=document.createElement('a');
+  a.download='kbank_slip_processed.png';
+  a.href=outC.toDataURL('image/png'); a.click();
 });
-
 resetBtn.addEventListener('click', () => {
-  currentImg = null;
-  drop.style.display = 'block';
-  caArea.style.display = 'none';
-  infoBox.style.display = 'none';
-  actions.style.display = 'none';
-  statusEl.style.display = 'none';
-  dlBtn.disabled = true;
-  fileIn.value = '';
-  showZonesChk.checked = false;
-  showZones = false;
+  currentImg=null;
+  drop.style.display='block';
+  caArea.style.display='none';
+  infoBox.style.display='none';
+  actions.style.display='none';
+  statusEl.style.display='none';
+  dlBtn.disabled=true; fileIn.value='';
+  zonesChk.checked=false; showZones=false;
 });
 </script>
 </body>
