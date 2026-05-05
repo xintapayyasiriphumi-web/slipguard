@@ -153,12 +153,13 @@ label.btn{cursor:pointer}
 
 <section class="hero">
   <h1>เบลอชื่อ<em>ผู้โอน</em> อัตโนมัติ</h1>
-  <p>ตรวจจับธนาคารอัตโนมัติจาก dominant color — รองรับ KBank (เขียว), SCB (ม่วง), TrueMoney (แดง), และ Krungthai (น้ำเงิน) ปรับ layout เองตามธนาคาร ไม่ใช้ OCR</p>
+  <p>ตรวจจับธนาคารอัตโนมัติจาก dominant color — รองรับ KBank (เขียว), SCB (ม่วง), TrueMoney (แดง), Krungthai (น้ำเงิน), และ Krungsri (เหลือง) ปรับ layout เองตามธนาคาร ไม่ใช้ OCR</p>
   <div class="tag-row">
     <span class="tag hi">🟩 KBank Auto</span>
     <span class="tag hi">🟣 SCB Auto</span>
     <span class="tag hi">🔴 TrueMoney Auto</span>
     <span class="tag hi">🔵 Krungthai Auto</span>
+    <span class="tag hi">🟡 Krungsri Auto</span>
     <span class="tag">Color Detection</span>
     <span class="tag">เบลอ: ผู้โอน</span>
     <span class="tag">No OCR</span>
@@ -177,7 +178,7 @@ label.btn{cursor:pointer}
 <!-- DROP ZONE -->
 <div id="drop">
   <div class="di">🧾</div>
-  <div class="dh">วาง KBank, SCB, TrueMoney หรือ Krungthai slip ที่นี่</div>
+  <div class="dh">วาง KBank, SCB, TrueMoney, Krungthai หรือ Krungsri slip ที่นี่</div>
   <div class="ds">ระบบจะตรวจจับธนาคารและปรับ layout อัตโนมัติ</div>
   <div class="fmts"><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span></div>
   <button class="btn-br" id="browse-btn">📂 เลือกไฟล์</button>
@@ -251,6 +252,13 @@ const LAYOUTS = {
     icon: '🔵',
     sender: { xP:.05, yP:.32, wP:.65, hP:.10 },
     qr:     { xP:.72, yP:.15, wP:.22, hP:.22 },
+    useCard: false,
+  },
+  krungsri: {
+    label: 'Krungsri / BAY',
+    icon: '🟡',
+    sender: { xP:.35, yP:.14, wP:.60, hP:.08 },
+    qr:     { xP:.68, yP:.40, wP:.26, hP:.26 },
     useCard: false,
   },
 };
@@ -385,7 +393,7 @@ function detectBank(ctx, W, H) {
   const id = ctx.getImageData(0, 0, W, sampleH);
   const d = id.data;
   
-  let greenScore = 0, purpleScore = 0, redScore = 0, blueScore = 0;
+  let greenScore = 0, purpleScore = 0, redScore = 0, blueScore = 0, yellowScore = 0;
   const step = 8; // sample every 8th pixel for performance
   
   for (let i = 0; i < d.length; i += 4 * step) {
@@ -397,14 +405,19 @@ function detectBank(ctx, W, H) {
     // Purple heuristic (SCB): B > G && R > G
     if (b > g && r > g && (r + b) > 200) purpleScore++;
     
-    // Red heuristic (TrueMoney): R > G && R > B
-    if (r > g && r > b && r > 100) redScore++;
+    // Red heuristic (TrueMoney): R > G && R > B && not yellow
+    if (r > g && r > b && r > 100 && !(r > 150 && g > 120)) redScore++;
     
     // Blue heuristic (Krungthai): B > R && B > G
     if (b > r && b > g && b > 100 && r < 150) blueScore++;
+    
+    // Yellow heuristic (Krungsri): R high, G high, B low
+    if (r > 140 && g > 120 && b < 120 && Math.abs(r - g) < 60) yellowScore++;
   }
   
   // Return bank with higher score, fallback to kbank
+  // Check yellow first with lower threshold
+  if (yellowScore > 20 && yellowScore > redScore * 0.6) return 'krungsri';
   if (blueScore > greenScore && blueScore > purpleScore && blueScore > redScore && blueScore > 50) return 'krungthai';
   if (redScore > greenScore && redScore > purpleScore && redScore > 50) return 'truemoney';
   if (purpleScore > greenScore && purpleScore > 50) return 'scb';
