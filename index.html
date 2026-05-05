@@ -255,7 +255,7 @@ label.btn{cursor:pointer}
 <!-- HERO -->
 <section class="hero">
   <h1>Redact Thai Bank Slips<br><em>Automatically</em></h1>
-  <p>ตรวจจับชื่อผู้โอน/ผู้รับอัตโนมัติ เบลอชื่อ และแทนที่ QR code ด้วยโลโก้ของคุณ — ทำงานใน browser ทั้งหมด ไม่มีการส่งข้อมูลออก</p>
+  <p>ตรวจจับและเบลอเฉพาะ <strong>ชื่อผู้รับเงิน</strong> อัตโนมัติ และแทนที่ QR code ด้วยโลโก้ของคุณ — ทำงานใน browser ทั้งหมด ไม่มีการส่งข้อมูลออก</p>
   <div class="bank-row">
     <span class="bank-tag">🟩 KBank / K+</span>
     <span class="bank-tag">🟣 SCB</span>
@@ -298,7 +298,7 @@ label.btn{cursor:pointer}
 <!-- BADGES -->
 <div id="badges">
   <span class="bdg bdg-q" id="b-qr"   style="display:none">📷 QR พบแล้ว — ใส่ Overlay</span>
-  <span class="bdg bdg-t" id="b-name" style="display:none">👤 ชื่อที่เบลอ: <b id="b-n">0</b> จุด</span>
+  <span class="bdg bdg-t" id="b-name" style="display:none">👤 เบลอชื่อ<b>ผู้รับเงิน</b>แล้ว</span>
   <span class="bdg bdg-w" id="b-skip" style="display:none">⚠️ ไม่พบข้อมูลที่ต้องประมวลผล</span>
 </div>
 
@@ -313,7 +313,7 @@ label.btn{cursor:pointer}
   <div class="panel">
     <div class="phead">
       <span class="ptitle"><span class="dot dp"></span>ประมวลผลแล้ว</span>
-      <span style="font-size:.68rem;color:var(--fog);font-family:'DM Mono',monospace">ชื่อถูกเบลอ • QR ถูกแทนที่</span>
+      <span style="font-size:.68rem;color:var(--fog);font-family:'DM Mono',monospace">ผู้รับเงินถูกเบลอ • QR ถูกแทนที่</span>
     </div>
     <div class="cw"><canvas id="out-c"></canvas></div>
   </div>
@@ -510,144 +510,174 @@ async function startProcess(img) {
     nameRegions = extractNameRegions(data, W, H);
     addLog(nameRegions.length > 0 ? 'ok' : 'warn',
       nameRegions.length > 0
-        ? `พบชื่อ ${nameRegions.length} จุด`
-        : 'ไม่พบชื่อที่ตรงเงื่อนไข');
+        ? `พบ candidate ผู้รับ ${nameRegions.length} รายการ — เลือก Y ต่ำสุด`
+        : 'ไม่พบชื่อผู้รับในโซนที่กำหนด');
     nameRegions.forEach((r,i) =>
-      addLog('info', `  ชื่อ#${i+1}: "${r.text}" (${Math.round(r.x)},${Math.round(r.y)}) conf:${Math.round(r.conf)}%`)
+      addLog('info', `  candidate#${i+1}: "${r.text}" Y=${Math.round(r.y)} score=${r.score}`)
     );
   } catch(e) { addLog('warn', 'OCR error: ' + e.message); }
 
-  /* ── 3. RENDER ── */
+  /* ── 3. RENDER — blur ONLY the single receiver (lowest name) ── */
   outX.drawImage(img, 0, 0);
-  nameRegions.forEach(r => blurRect(outX, r.x-5, r.y-4, r.w+10, r.h+8, 20));
+  const receiver = nameRegions.length > 0
+    ? nameRegions.reduce((bot, r) => (r.y + r.h > bot.y + bot.h ? r : bot))
+    : null;
+  if (receiver) {
+    blurRect(outX, receiver.x - 6, receiver.y - 4, receiver.w + 12, receiver.h + 8, 22);
+    addLog('ok', `เบลอผู้รับ: "${receiver.text}" Y=${Math.round(receiver.y)}`);
+  }
   if (qrRegion) drawOverlay(outX, qrRegion);
 
   /* ── 4. BADGES ── */
-  const found = qrRegion || nameRegions.length > 0;
-  bQR.style.display   = qrRegion ? 'flex' : 'none';
-  bName.style.display = nameRegions.length > 0 ? 'flex' : 'none';
-  bSkip.style.display = !found ? 'flex' : 'none';
-  bN.textContent = nameRegions.length;
+  const found = qrRegion || receiver;
+  bQR.style.display   = qrRegion  ? 'flex' : 'none';
+  bName.style.display = receiver  ? 'flex' : 'none';
+  bSkip.style.display = !found    ? 'flex' : 'none';
+  bN.textContent = receiver ? 1 : 0;
 
   dlBtn.disabled = false;
   setStatus(found ? 'ok' : 'warn',
     found
-      ? `✅ เสร็จสิ้น — ${nameRegions.length} ชื่อ${qrRegion ? ', QR ถูกแทนที่' : ''}`
-      : '⚠️ ไม่พบชื่อหรือ QR บนภาพนี้'
+      ? `✅ เสร็จสิ้น — ${receiver ? 'เบลอชื่อผู้รับแล้ว' : ''}${receiver && qrRegion ? ', ' : ''}${qrRegion ? 'QR ถูกแทนที่' : ''}`
+      : '⚠️ ไม่พบชื่อผู้รับหรือ QR บนภาพนี้'
   );
   renderLog();
 }
 
 /* ══════════════════════════════════════════════
-   NAME EXTRACTION — THAI HEURISTICS
+   NAME EXTRACTION — RECEIVER-ONLY HEURISTICS
+   Strategy:
+   1. Collect all candidate name lines (scored)
+   2. Identify receiver anchor: lines with ผู้รับ/ไปยัง/to keywords
+   3. Prefer name lines BELOW the arrow/receiver keyword
+   4. If no anchor found, use lower half of image (below midpoint)
+   5. Return ALL qualifying candidates — caller picks the LOWEST one
 ══════════════════════════════════════════════ */
 function extractNameRegions(data, imgW, imgH) {
   const results = [];
 
-  /* PATTERN MATCHERS */
-  const isNumber     = s => /^[\d\s.,\-/+:]+$/.test(s);
-  const isMasked     = s => /x{3,}|X{3,}|\*{3,}|-\d{4}-/.test(s);
-  const isDate       = s => /\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/.test(s);
-  const isTime       = s => /\d{1,2}:\d{2}/.test(s);
-  const isAmount     = s => /^[\d,]+(\.\d{2})?$/.test(s.replace(/\s/g,''));
-  const isRef        = s => /REF|TXN|TRANS|รายการ|อ้างอิง/i.test(s);
-  const isBankMeta   = s => /ธนาคาร|BANK|บัญชี|ACCOUNT|SCB|KTB|BBL|BAY|TTB|UOB|CIMB|กสิกร|ไทยพาณิชย์/i.test(s);
-  const isThaiName   = s => /^[ก-๛\s]{4,}$/.test(s.trim()) && !/\d/.test(s);
-  const isEngName    = s => /^[A-Z][a-z]+([\s\-][A-Z][a-z]+)+$/.test(s.trim());
-  const isNameHint   = s => /จาก|ไปยัง|ผู้โอน|ผู้รับ|โอนจาก|โอนไป|ชื่อ|from|to\b/i.test(s);
+  /* ── FILTERS ── */
+  const isJunk = s => {
+    const t = s.trim();
+    if (t.length < 2) return true;
+    if (/^[\d\s.,\-/+:฿()]+$/.test(t)) return true;        // pure numbers/symbols
+    if (/x{3,}|X{3,}|\*{4,}/.test(t)) return true;          // masked account
+    if (/\d{3,}[-\s]\d/.test(t)) return true;                // account-like
+    if (/\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/.test(t)) return true; // date
+    if (/\d{1,2}:\d{2}/.test(t)) return true;                // time
+    if (/^[\d,]+(\.\d{2})?$/.test(t.replace(/\s/g,''))) return true;   // amount
+    if (/REF|TXN|TRANS|รายการ|อ้างอิง|หมายเลข|เลขที่/i.test(t)) return true;
+    if (/ธนาคาร|BANK|บัญชี|ACCOUNT|สาขา|BRANCH/i.test(t)) return true;
+    if (/SCB|KTB|BBL|BAY|TTB|UOB|CIMB|KBANK|TMB|GSB/i.test(t)) return true;
+    if (/[:：]$/.test(t)) return true;                       // label ending colon
+    if ((t.match(/\d/g)||[]).length / t.length > 0.35) return true; // number-heavy
+    return false;
+  };
 
-  // Collect all words with their bboxes for context
-  const allWords = [];
+  const isNameLike = s => {
+    const t = s.trim();
+    if (/^[ก-๛][ก-๛\s]{2,}$/.test(t) && !/\d/.test(t)) return true;  // pure Thai
+    if (/^[A-Z][a-z]+([\s\-][A-Z][a-z]+)+$/.test(t)) return true;      // Firstname Lastname
+    if (/^[A-Z]{2,}(\s[A-Z]{2,})+$/.test(t)) return true;              // ALL CAPS name
+    if (/[ก-๛]{2,}/.test(t) && t.length <= 40 && !/\d/.test(t)) return true; // Thai mixed
+    return false;
+  };
+
+  /* ── PASS 1: find receiver-keyword anchor Y positions ──
+     Keywords: ผู้รับ, ไปยัง, โอนไป, to, receiver, ▼, →
+     Arrow icons often appear as lines containing only symbols
+  */
+  const RECV_KW = /ผู้รับ|ผู้รับเงิน|ไปยัง|โอนไป|receiver|to\s*:/i;
+  const SEND_KW = /ผู้โอน|โอนจาก|จาก|from\s*:/i;
+  const ARROW   = /^[\s▼↓→➜➡⬇\-–—|]{0,4}$/;
+
+  let receiverAnchorY = null;  // Y below which receiver name lives
+  let senderAnchorY   = null;
+
   data.lines.forEach(line => {
-    line.words && line.words.forEach(w => {
-      allWords.push({ text: w.text, bbox: w.bbox, conf: w.confidence,
-        lineY: line.bbox.y0, lineH: line.bbox.y1 - line.bbox.y0 });
-    });
-  });
-
-  // ── PASS 1: lines near keyword hints ──
-  const hintLines = new Set();
-  data.lines.forEach((line, li) => {
-    const txt = line.text;
-    if (isNameHint(txt)) {
-      // mark this line and ±2 lines around it
-      for (let d = -1; d <= 3; d++) {
-        if (data.lines[li + d]) hintLines.add(li + d);
+    const t = line.text.trim();
+    if (RECV_KW.test(t)) {
+      const y = line.bbox.y1; // bottom of keyword line
+      if (receiverAnchorY === null || y > receiverAnchorY) receiverAnchorY = y;
+      addLog('info', `  ผู้รับ-anchor Y=${Math.round(y)} "${t}"`);
+    }
+    if (SEND_KW.test(t)) {
+      const y = line.bbox.y1;
+      if (senderAnchorY === null || y < senderAnchorY) senderAnchorY = y;
+      addLog('info', `  ผู้โอน-anchor Y=${Math.round(y)} "${t}"`);
+    }
+    // Arrow symbols often mark the divider
+    if (ARROW.test(t) && t.length > 0) {
+      const y = line.bbox.y1;
+      if (receiverAnchorY === null || y > receiverAnchorY) {
+        // only use arrow as anchor if it's in middle area (20%-70%)
+        const relY = line.bbox.y0 / imgH;
+        if (relY >= 0.2 && relY <= 0.7) {
+          receiverAnchorY = y;
+          addLog('info', `  arrow-anchor Y=${Math.round(y)} "${t}"`);
+        }
       }
     }
   });
 
-  // ── PASS 2: score every line ──
+  // Fallback: if no keyword found, receiver zone = lower 45% of image
+  const recvZoneTop = receiverAnchorY !== null
+    ? receiverAnchorY
+    : imgH * 0.42;
+
+  addLog('info', `  Receiver zone starts at Y=${Math.round(recvZoneTop)} (${Math.round(recvZoneTop/imgH*100)}%)`);
+
+  /* ── PASS 2: score every line, only accept those in receiver zone ── */
+  const avgLineH = imgH / 38;
+
   data.lines.forEach((line, li) => {
-    const raw   = line.text.trim();
-    if (raw.length < 2) return;
-    if (line.confidence < 18) return;
-    if (isNumber(raw)) return;
-    if (isMasked(raw)) return;
-    if (isDate(raw)) return;
-    if (isTime(raw)) return;
-    if (isAmount(raw)) return;
-    if (isRef(raw)) return;
-    if (isBankMeta(raw)) return;
-    if (/^\s*$/.test(raw)) return;
+    const raw = line.text.trim();
+    if (isJunk(raw)) return;
+    if (line.confidence < 15) return;
 
     const { x0, y0, x1, y1 } = line.bbox;
-    const lineH = y1 - y0;
-    const relY  = y0 / imgH; // 0=top, 1=bottom
+    const lineH  = y1 - y0;
+    const relY   = y0 / imgH;
+
+    // Must be in receiver zone (below anchor)
+    if (y0 < recvZoneTop - lineH * 0.5) {
+      addLog('info', `  [${li}] SKIP (above recv zone Y=${Math.round(y0)}) "${raw.substring(0,25)}"`);
+      return;
+    }
+    // Don't go too low (last 10% = footer/timestamp)
+    if (relY > 0.90) return;
 
     let score = 0;
-    let reason = [];
+    const reason = [];
 
-    // Font size heuristic: taller lines = larger font = more likely a name
-    const avgH = imgH / 40; // rough line height baseline
-    if (lineH > avgH * 1.6) { score += 30; reason.push('large-font'); }
-    else if (lineH > avgH * 1.2) { score += 15; reason.push('med-font'); }
+    // Font size — larger = more likely a name
+    if (lineH > avgLineH * 1.5) { score += 35; reason.push('large'); }
+    else if (lineH > avgLineH * 1.1) { score += 18; reason.push('med'); }
 
-    // Thai name pattern (pure Thai, no digits)
-    if (isThaiName(raw)) { score += 40; reason.push('thai-name'); }
+    // Name pattern
+    if (isNameLike(raw)) { score += 50; reason.push('name-pattern'); }
 
-    // English name pattern (Capitalized words)
-    if (isEngName(raw)) { score += 35; reason.push('eng-name'); }
-
-    // Mixed Thai+English short name-like
-    if (/[ก-๛]/.test(raw) && raw.length < 40 && !/\d/.test(raw)) {
-      score += 20; reason.push('thai-text');
+    // Proximity to receiver keyword (within 3 lines)
+    if (receiverAnchorY !== null) {
+      const dist = y0 - receiverAnchorY;
+      if (dist >= 0 && dist < lineH * 4) { score += 40; reason.push('near-recv-kw'); }
+      else if (dist >= 0 && dist < lineH * 8) { score += 20; reason.push('close-recv'); }
     }
 
-    // Near a hint line
-    if (hintLines.has(li)) { score += 45; reason.push('near-hint'); }
+    // Horizontal — names are not edge-to-edge
+    const lw = x1 - x0;
+    if (lw > imgW * 0.88) { score -= 25; reason.push('too-wide'); }
+    if (lw < imgW * 0.05) { score -= 20; reason.push('too-narrow'); }
 
-    // Positional: sender area = upper 15-45%, receiver = 45-75%
-    if (relY >= 0.10 && relY <= 0.75) { score += 10; reason.push('valid-zone'); }
-    if (relY < 0.10 || relY > 0.88)  { score -= 20; reason.push('out-of-zone'); }
+    addLog('info', `  [${li}] score=${score} Y=${Math.round(y0)} "${raw.substring(0,28)}" [${reason.join(',')}]`);
 
-    // Horizontal position: names are typically center or left-of-center
-    const centerX = (x0 + x1) / 2 / imgW;
-    if (centerX >= 0.1 && centerX <= 0.9) { score += 5; }
-
-    // Width heuristic: names are not super wide (not full-width labels)
-    const lineW = x1 - x0;
-    if (lineW > imgW * 0.85) { score -= 20; reason.push('too-wide'); }
-
-    // Penalize lines that look like labels (short, ends with colon)
-    if (raw.length < 4) { score -= 15; }
-    if (/[:：]$/.test(raw)) { score -= 20; reason.push('label'); }
-
-    // Penalize number-heavy lines
-    const digitRatio = (raw.match(/\d/g) || []).length / raw.length;
-    if (digitRatio > 0.3) { score -= 25; reason.push('number-heavy'); }
-
-    addLog('info', `  [${li}] score=${score} "${raw.substring(0,30)}" [${reason.join(',')}]`);
-
-    if (score >= 45) {
-      results.push({ x:x0, y:y0, w:x1-x0, h:y1-y0, text:raw,
-        score, conf:line.confidence });
+    if (score >= 40) {
+      results.push({ x:x0, y:y0, w:x1-x0, h:y1-y0,
+        text:raw, score, conf:line.confidence });
     }
   });
 
-  // Sort by score desc, remove overlapping
-  results.sort((a,b) => b.score - a.score);
-  return dedup(results);
+  return results; // caller will pick the single lowest one
 }
 
 /* Remove heavily overlapping regions */
