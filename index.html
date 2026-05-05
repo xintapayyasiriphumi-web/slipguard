@@ -414,31 +414,46 @@ function pass(id, rad) {
   }
 }
 
-/* ────── QR OVERLAY ────── */
+/* ────── QR OVERLAY (center-based, circular clip) ────── */
 function drawQROverlay(ctx, qr) {
-  const PAD=.08, SCALE=.85;
-  const ox=qr.x+qr.w*PAD, oy=qr.y+qr.h*PAD;
-  const ow=qr.w*(1-PAD*2), oh=qr.h*(1-PAD*2);
-  const cx=ox+ow/2, cy=oy+oh/2, cr=Math.min(ow,oh)/2;
+  const SCALE = 0.83;
+
+  // Pixel-perfect center of QR bounding box
+  const cx = qr.x + qr.w / 2;
+  const cy = qr.y + qr.h / 2;
+  const cr = Math.min(qr.w, qr.h) / 2;
 
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cy,cr,0,Math.PI*2);
-  ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fill();
-  ctx.restore();
 
+  // 1. White circle background
+  ctx.beginPath();
+  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.96)';
+  ctx.fill();
+
+  // 2. Clip to circle so overlay never bleeds outside
+  ctx.clip();
+
+  // 3. Draw overlay centered
   if (overlayImg) {
-    const ar=overlayImg.naturalWidth/overlayImg.naturalHeight;
-    let dw=ow*SCALE, dh=oh*SCALE;
-    if(dw/dh>ar) dw=dh*ar; else dh=dw/ar;
-    const dx=clamp(cx-dw/2,qr.x,qr.x+qr.w-dw);
-    const dy=clamp(cy-dh/2,qr.y,qr.y+qr.h-dh);
-    ctx.drawImage(overlayImg,dx,dy,dw,dh);
+    const ar  = overlayImg.naturalWidth / overlayImg.naturalHeight;
+    const dia = cr * 2 * SCALE;
+    let dw, dh;
+    if (ar >= 1) { dw = dia; dh = dia / ar; }
+    else         { dh = dia; dw = dia * ar; }
+
+    // Center-based: drawX = center - half width
+    const drawX = clamp(cx - dw / 2, qr.x, qr.x + qr.w - dw);
+    const drawY = clamp(cy - dh / 2, qr.y, qr.y + qr.h - dh);
+    ctx.drawImage(overlayImg, drawX, drawY, dw, dh);
   } else {
-    ctx.fillStyle='#6b38ff';
-    ctx.font=`bold ${Math.round(oh*.32)}px sans-serif`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('IX',cx,cy);
+    ctx.fillStyle = '#6b38ff';
+    ctx.font = `bold ${Math.round(cr * 0.7)}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('IX', cx, cy);
   }
+
+  ctx.restore();
 }
 
 /* ────── ZONE OUTLINE ────── */
