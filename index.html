@@ -152,7 +152,7 @@ label.btn{cursor:pointer}
 
 <section class="hero">
   <h1>เบลอชื่อ<em>ผู้โอน</em> — Batch Mode</h1>
-  <p>อัปโหลดหลายรูปพร้อมกัน · ยืนยันธนาคารต่อรูป · ลากปรับ Blur &amp; QR · Download ทั้งหมดเป็น ZIP</p>
+  <p>อัปโหลดหลายรูปพร้อมกัน · Auto detect ธนาคาร → เปลี่ยนได้ที่ thumbnail · ลากปรับ Blur &amp; QR · Download ZIP</p>
   <div class="tag-row">
     <span class="tag hi">🟩 KBank</span><span class="tag hi">🟣 SCB</span><span class="tag hi">🔴 TrueMoney</span>
     <span class="tag hi">🔵 Krungthai</span><span class="tag hi">🟡 Krungsri</span><span class="tag hi">🟪 KKP</span>
@@ -173,7 +173,7 @@ label.btn{cursor:pointer}
 <div id="drop">
   <div class="di">🧾</div>
   <div class="dh">วางหลายรูปพร้อมกันได้เลย</div>
-  <div class="ds">Auto detect ธนาคาร → ยืนยันต่อรูป → ลากปรับ Blur &amp; QR → Download ZIP</div>
+  <div class="ds">Auto detect ธนาคาร → เปลี่ยนได้ที่ thumbnail → ลากปรับ Blur &amp; QR → Download ZIP</div>
   <div class="fmts"><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span></div>
   <button class="btn-br" id="browse-btn">📂 เลือกไฟล์ (หลายรูปได้)</button>
   <input type="file" id="file-in" accept="image/jpeg,image/png,image/webp" multiple>
@@ -270,30 +270,7 @@ label.btn{cursor:pointer}
   </div>
 </div>
 
-<!-- BANK CONFIRM MODAL -->
-<div id="bank-confirm">
-  <div class="bc-box">
-    <div class="bc-title">🔍 ยืนยันธนาคาร</div>
-    <div class="bc-sub" id="bc-sub">ระบบ detect ได้ดังนี้ — กด "ใช้เลย" ถ้าถูกต้อง หรือเลือกธนาคารที่ถูกด้านล่าง</div>
-    <div class="bc-detected" id="bc-detected">
-      <span>🤖 Auto detect:</span>
-      <strong id="bc-auto-name">—</strong>
-      <span style="color:var(--mist);font-size:.78rem">(conf: <span id="bc-conf">—</span>)</span>
-    </div>
-    <div class="bc-banks">
-      <button class="bc-btn" data-bank="kbank">🟩 KBank</button>
-      <button class="bc-btn" data-bank="scb">🟣 SCB</button>
-      <button class="bc-btn" data-bank="truemoney">🔴 TrueMoney</button>
-      <button class="bc-btn" data-bank="krungthai">🔵 Krungthai</button>
-      <button class="bc-btn" data-bank="krungsri">🟡 Krungsri</button>
-      <button class="bc-btn" data-bank="kkp">🟪 KKP</button>
-    </div>
-    <div class="bc-footer">
-      <button class="btn bo" id="bc-cancel">ยกเลิก</button>
-      <button class="btn bv" id="bc-confirm">✓ ใช้เลย</button>
-    </div>
-  </div>
-</div>
+<!-- BANK CONFIRM MODAL (ปิดใช้งาน — ใช้ inline selector แทน) -->
 
 <!-- ACTIONS BAR -->
 <div id="actions-bar">
@@ -319,7 +296,7 @@ let slips=[];           // array of slip objects
 let activeIdx=-1;       // currently editing index
 let showZones=false;
 let dragState=null;
-let confirmQueue=[];    // queue of slip indices waiting for bank confirm
+let confirmQueue=[]; // ไม่ใช้แล้ว เก็บไว้ไม่ให้ error
 
 /* ══ SLIP OBJECT structure:
   { file, img, name, bank, autoBank, conf, senderRect, qrRect, done }
@@ -335,7 +312,7 @@ const slipGrid=document.getElementById('slip-grid');
 const editorArea=document.getElementById('editor-area');
 const batchToolbar=document.getElementById('batch-toolbar');
 const actionsBar=document.getElementById('actions-bar');
-const bankConfirm=document.getElementById('bank-confirm');
+const bankConfirm=null; // modal ถูกลบออกแล้ว ใช้ inline selector แทน
 
 /* ══ OVERLAY ══ */
 function makeFallback(){
@@ -376,7 +353,6 @@ function addFiles(files){
   editorArea.classList.add('show');
   actionsBar.classList.add('show');
 
-  const startIdx=slips.length;
   arr.forEach(f=>{
     const slip={file:f,img:null,name:f.name,bank:null,autoBank:null,conf:0,senderRect:null,qrRect:null,done:false};
     slips.push(slip);
@@ -384,6 +360,31 @@ function addFiles(files){
     loadSlipImage(slip,idx);
   });
   updateGrid();
+}
+
+function loadSlipImage(slip,idx){
+  const rd=new FileReader();
+  rd.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      slip.img=img;
+      // auto detect และ assign ทันที ไม่ต้อง confirm
+      const tmp=document.createElement('canvas');
+      tmp.width=img.naturalWidth;tmp.height=img.naturalHeight;
+      tmp.getContext('2d').drawImage(img,0,0);
+      const{bank,conf}=detectBank(tmp.getContext('2d'),img.naturalWidth,img.naturalHeight);
+      slip.autoBank=bank;slip.conf=conf;
+      slip.bank=bank;
+      initSlipRects(slip);
+      updateThumb(idx);
+      updateBatchCount();
+      updateGrid();
+      // activate first slip
+      if(activeIdx<0)setActive(idx);
+    };
+    img.src=e.target.result;
+  };
+  rd.readAsDataURL(slip.file);
 }
 
 
@@ -437,16 +438,65 @@ function renderActive(){
 
 function checkAllDone(){
   const doneCnt=slips.filter(s=>s.done).length;
-  const allDone=doneCnt===slips.filter(s=>s.bank).length&&slips.filter(s=>s.bank).length===slips.length;
+  const allDone=slips.length>0&&doneCnt===slips.length;
   document.getElementById('dl-all-btn').disabled=!allDone;
   document.getElementById('dl-all-btn2').disabled=!allDone;
 }
 
 /* ══ GRID ══ */
+function updateGrid(){
+  slipGrid.innerHTML='';
+  slips.forEach((slip,i)=>{
+    const el=document.createElement('div');
+    el.className='slip-thumb'+(i===activeIdx?' active':'');
+    const bankOpts=Object.entries(LAYOUTS).map(([k,v])=>
+      `<option value="${k}"${slip.bank===k?' selected':''}>${v.icon} ${v.label.split('/')[0]}</option>`
+    ).join('');
+    el.innerHTML=`
+      <div class="slip-remove">✕</div>
+      <div class="slip-status${slip.done?' done':''}" id="st-${i}">${slip.done?'✓':''}</div>
+      <canvas id="thumb-cv-${i}" style="width:100%;height:110px;object-fit:cover;display:block;border-radius:4px 4px 0 0"></canvas>
+      <div class="slip-thumb-info">
+        <select class="thumb-bank-sel" id="sel-${i}">${bankOpts}</select>
+        <div class="slip-conf" id="conf-${i}">${slip.conf?slip.conf+'%':''}</div>
+      </div>`;
+    el.addEventListener('click',e=>{
+      if(e.target.classList.contains('slip-remove')||e.target.tagName==='SELECT'||e.target.tagName==='OPTION')return;
+      if(slip.bank)setActive(i);
+    });
+    el.querySelector('.slip-remove').addEventListener('click',e=>{e.stopPropagation();removeSlip(i);});
+    el.querySelector('.thumb-bank-sel').addEventListener('change',e=>{
+      e.stopPropagation();
+      slips[i].bank=e.target.value;
+      initSlipRects(slips[i]);
+      slips[i].done=false;
+      updateThumb(i);
+      if(activeIdx===i){renderActive();updateEditorBankButtons();}
+    });
+    slipGrid.appendChild(el);
+    if(slip.img){
+      const tc=document.getElementById(`thumb-cv-${i}`);
+      if(tc){tc.width=slip.img.naturalWidth;tc.height=slip.img.naturalHeight;tc.getContext('2d').drawImage(slip.img,0,0);}
+    }
+  });
+}
 
 
 function updateBatchCount(){
   document.getElementById('batch-count').textContent=`${slips.length} รูป`;
+}
+function updateThumb(i){
+  const slip=slips[i];
+  const sel=document.getElementById(`sel-${i}`);
+  if(sel&&slip.bank)sel.value=slip.bank;
+  const confEl=document.getElementById(`conf-${i}`);
+  if(confEl)confEl.textContent=slip.conf?slip.conf+'%':'';
+  const st=document.getElementById(`st-${i}`);
+  if(st){st.className='slip-status'+(slip.done?' done':'');st.textContent=slip.done?'✓':'';}
+  if(slip.img){
+    const tc=document.getElementById(`thumb-cv-${i}`);
+    if(tc){tc.width=slip.img.naturalWidth;tc.height=slip.img.naturalHeight;tc.getContext('2d').drawImage(slip.img,0,0);}
+  }
 }
 function removeSlip(i){
   slips.splice(i,1);
