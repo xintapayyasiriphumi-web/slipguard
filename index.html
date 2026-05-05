@@ -414,46 +414,58 @@ function pass(id, rad) {
   }
 }
 
-/* ────── QR OVERLAY (center-based, circular clip) ────── */
+/* ────── QR OVERLAY (subpixel-accurate, circular clip) ────── */
 function drawQROverlay(ctx, qr) {
   const SCALE = 0.83;
 
-  // Pixel-perfect center of QR bounding box
-  const cx = qr.x + qr.w / 2;
-  const cy = qr.y + qr.h / 2;
-  const cr = Math.min(qr.w, qr.h) / 2;
+  // Subpixel-exact center — keep as float, never round
+  const cx = qr.x + qr.w * 0.5;
+  const cy = qr.y + qr.h * 0.5;
+  const cr = Math.min(qr.w, qr.h) * 0.5;
 
   ctx.save();
 
-  // 1. White circle background
+  // High-quality resampling for overlay image
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  // 1. White circle background — subpixel arc
   ctx.beginPath();
   ctx.arc(cx, cy, cr, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.96)';
+  ctx.fillStyle = 'rgba(255,255,255,0.97)';
   ctx.fill();
 
-  // 2. Clip to circle so overlay never bleeds outside
+  // 2. Circular clip path (re-declare after fill so clip is fresh)
+  ctx.beginPath();
+  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
   ctx.clip();
 
-  // 3. Draw overlay centered
+  // 3. Translate to exact center, draw image at (-dw/2, -dh/2)
+  //    This guarantees zero rounding error from coordinate arithmetic
   if (overlayImg) {
-    const ar  = overlayImg.naturalWidth / overlayImg.naturalHeight;
+    const iw = overlayImg.naturalWidth;
+    const ih = overlayImg.naturalHeight;
+    const ar = iw / ih;
+
+    // Fit inside scaled circle: longest side = dia
     const dia = cr * 2 * SCALE;
     let dw, dh;
     if (ar >= 1) { dw = dia; dh = dia / ar; }
     else         { dh = dia; dw = dia * ar; }
 
-    // Center-based: drawX = center - half width
-    const drawX = clamp(cx - dw / 2, qr.x, qr.x + qr.w - dw);
-    const drawY = clamp(cy - dh / 2, qr.y, qr.y + qr.h - dh);
-    ctx.drawImage(overlayImg, drawX, drawY, dw, dh);
+    // Translate to center, then draw at exact −½ offsets (float, no rounding)
+    ctx.translate(cx, cy);
+    ctx.drawImage(overlayImg, -dw * 0.5, -dh * 0.5, dw, dh);
   } else {
+    ctx.translate(cx, cy);
     ctx.fillStyle = '#6b38ff';
-    ctx.font = `bold ${Math.round(cr * 0.7)}px sans-serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('IX', cx, cy);
+    ctx.font = `bold ${cr * 0.7}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('IX', 0, 0);
   }
 
-  ctx.restore();
+  ctx.restore(); // resets translate + clip + imageSmoothingQuality
 }
 
 /* ────── ZONE OUTLINE ────── */
