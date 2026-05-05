@@ -3,317 +3,293 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SlipShield — Thai Bank Slip Redaction</title>
+<title>KBank Slip Shield</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
-/* ── TOKENS ─────────────────────────────────── */
-:root{
-  --ink:    #060612;
-  --ink2:   #0c0c22;
-  --ink3:   #121230;
-  --plate:  #181835;
-  --plate2: #1e1e42;
-  --edge:   rgba(99,60,255,.16);
-  --edge2:  rgba(99,60,255,.30);
-  --violet: #6c3bff;
-  --indigo: #8b63ff;
-  --lilac:  #b59eff;
-  --glow:   rgba(108,59,255,.45);
-  --snow:   #f0ecff;
-  --mist:   #7a70a8;
-  --fog:    #3a3660;
-  --jade:   #0fb981;
-  --amber:  #f5a623;
-  --r:12px; --rs:7px;
+:root {
+  --bg:      #06060f;
+  --bg2:     #0b0b1d;
+  --surface: #111128;
+  --surf2:   #191936;
+  --edge:    rgba(100,60,255,.15);
+  --edge2:   rgba(100,60,255,.30);
+  --v:       #6b38ff;
+  --v2:      #8b5cf6;
+  --v3:      #c4b5fd;
+  --glow:    rgba(107,56,255,.42);
+  --snow:    #ede9ff;
+  --mist:    #786fa8;
+  --fog:     #383460;
+  --jade:    #10b981;
+  --amber:   #f59e0b;
+  --r: 13px;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:'IBM Plex Sans Thai',system-ui,sans-serif;
-  background:var(--ink);color:var(--snow);min-height:100vh;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;
+  background: var(--bg); color: var(--snow); min-height: 100vh;
   background-image:
-    radial-gradient(ellipse 65% 45% at 10% -5%,rgba(108,59,255,.11) 0%,transparent 60%),
-    radial-gradient(ellipse 55% 35% at 90% 105%,rgba(139,99,255,.08) 0%,transparent 60%);
-  overflow-x:hidden;
+    radial-gradient(ellipse 60% 40% at 12% 0%, rgba(107,56,255,.10) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 88% 100%, rgba(139,92,246,.07) 0%, transparent 55%);
+}
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
+}
+.wrap { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 0 26px; }
+
+/* HEADER */
+header {
+  padding: 24px 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--edge);
+}
+.brand { display: flex; align-items: center; gap: 11px; }
+.gem {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: linear-gradient(135deg, var(--v), var(--v2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; box-shadow: 0 0 20px var(--glow);
+}
+.brand-name { font-size: 1.2rem; font-weight: 700; letter-spacing: -.4px; }
+.brand-name span { color: var(--v3); }
+.chip {
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: 1.2px;
+  background: rgba(107,56,255,.12); border: 1px solid var(--edge2);
+  color: var(--v3); padding: 4px 11px; border-radius: 999px;
 }
 
-/* GRAIN */
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.03'/%3E%3C/svg%3E");
+/* HERO */
+.hero { padding: 44px 0 32px; text-align: center; }
+.hero h1 {
+  font-size: clamp(1.8rem, 3.6vw, 2.8rem); font-weight: 700;
+  letter-spacing: -.5px; line-height: 1.12;
 }
+.hero h1 em { font-style: normal; color: var(--v3); }
+.hero p { color: var(--mist); margin-top: 12px; max-width: 500px; margin-inline: auto; font-size: .94rem; line-height: 1.7; }
+.tag-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+.tag {
+  font-size: .7rem; font-weight: 600; padding: 5px 13px; border-radius: 999px;
+  border: 1px solid var(--edge); background: var(--surface); color: var(--mist);
+}
+.tag.active { background: rgba(107,56,255,.15); border-color: var(--edge2); color: var(--v3); }
 
-.z{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:0 28px}
+/* OVERLAY CONFIG */
+.cfg-bar {
+  display: flex; align-items: center; gap: 13px; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: var(--r); padding: 14px 20px; margin-bottom: 22px;
+}
+.cfg-lbl { font-size: .74rem; font-weight: 600; color: var(--mist); letter-spacing: .5px; white-space: nowrap; }
+.ov-thumb {
+  width: 40px; height: 40px; border-radius: 7px; object-fit: cover;
+  border: 1px solid var(--edge2); background: var(--surf2); flex-shrink: 0;
+}
+.cfg-in {
+  flex: 1; min-width: 160px; background: var(--surf2); border: 1px solid var(--edge);
+  color: var(--snow); border-radius: 7px; padding: 9px 13px;
+  font-size: .8rem; font-family: 'DM Mono', monospace; outline: none; transition: .18s;
+}
+.cfg-in:focus { border-color: var(--edge2); box-shadow: 0 0 0 3px rgba(107,56,255,.12); }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer;
+  font-family: 'IBM Plex Sans Thai', sans-serif; font-size: .82rem; font-weight: 600;
+  transition: all .18s;
+}
+.btn-v  { background: var(--v); color: #fff; }
+.btn-v:hover { background: var(--v2); box-shadow: 0 0 16px var(--glow); }
+.btn-g  { background: linear-gradient(135deg, #059669, var(--jade)); color: #fff; }
+.btn-g:hover { box-shadow: 0 0 14px rgba(16,185,129,.4); }
+.btn-o  { background: var(--surf2); color: var(--mist); border: 1px solid var(--edge); }
+.btn-o:hover { color: var(--snow); border-color: var(--edge2); }
+.btn:disabled { opacity: .3; cursor: not-allowed; pointer-events: none; }
+label.btn { cursor: pointer; }
 
-/* ── HEADER ──────────────────────────────────── */
-header{
-  padding:24px 0 20px;
-  display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--edge);
+/* DROP ZONE */
+#drop {
+  border: 2px dashed var(--edge2); border-radius: 18px;
+  padding: 58px 40px; text-align: center; cursor: pointer;
+  background: var(--bg2); position: relative; overflow: hidden;
+  transition: all .22s; margin-bottom: 24px;
 }
-.brand{display:flex;align-items:center;gap:12px}
-.brand-gem{
-  width:38px;height:38px;border-radius:10px;
-  background:linear-gradient(135deg,var(--violet),var(--indigo));
-  display:flex;align-items:center;justify-content:center;font-size:18px;
-  box-shadow:0 0 22px var(--glow);
+#drop::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 55%, rgba(107,56,255,.055), transparent 65%);
 }
-.brand-name{font-size:1.25rem;font-weight:700;letter-spacing:-.4px}
-.brand-name b{color:var(--lilac)}
-.pill{
-  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1.2px;
-  background:rgba(108,59,255,.12);border:1px solid var(--edge2);
-  color:var(--lilac);padding:4px 11px;border-radius:999px;
+#drop:hover, #drop.over {
+  border-color: var(--v2); background: rgba(107,56,255,.07);
+  box-shadow: 0 0 40px rgba(107,56,255,.12);
 }
+.drop-icon { font-size: 2.8rem; margin-bottom: 14px; opacity: .7; }
+.drop-h { font-size: 1.15rem; font-weight: 700; }
+.drop-s { color: var(--mist); font-size: .875rem; margin-top: 7px; }
+.fmts { display: flex; gap: 8px; justify-content: center; margin-top: 15px; }
+.fmt {
+  font-family: 'DM Mono', monospace; font-size: .67rem; letter-spacing: 1px;
+  background: var(--surface); border: 1px solid var(--edge);
+  color: var(--mist); padding: 3px 10px; border-radius: 5px;
+}
+.btn-browse {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
+  background: linear-gradient(135deg, var(--v), var(--v2));
+  color: #fff; border: none; border-radius: 999px; padding: 11px 28px;
+  font-size: .87rem; font-weight: 700; font-family: 'IBM Plex Sans Thai', sans-serif;
+  cursor: pointer; transition: all .2s; box-shadow: 0 4px 20px rgba(107,56,255,.36);
+}
+.btn-browse:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(107,56,255,.48); }
+#file-in { display: none; }
 
-/* ── HERO ─────────────────────────────────────── */
-.hero{padding:48px 0 36px;text-align:center}
-.hero h1{
-  font-size:clamp(1.85rem,3.8vw,2.85rem);font-weight:700;
-  letter-spacing:-.6px;line-height:1.12;
+/* STATUS */
+#status {
+  display: none; align-items: center; gap: 11px;
+  padding: 12px 17px; border-radius: 9px; margin-bottom: 18px;
+  font-size: .83rem; border: 1px solid;
 }
-.hero h1 em{font-style:normal;color:var(--lilac)}
-.hero p{color:var(--mist);margin-top:13px;max-width:520px;
-  margin-inline:auto;font-size:.95rem;line-height:1.7}
+#status.proc { background: rgba(107,56,255,.08); border-color: var(--edge2); color: var(--v3); }
+#status.ok   { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.28); color: var(--jade); }
+#status.warn { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.28); color: var(--amber); }
 
-/* Bank badges */
-.bank-row{
-  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
-  margin-top:22px;
+/* CANVAS AREA */
+#canvas-area { display: none; gap: 18px; margin-bottom: 24px; }
+.panel {
+  flex: 1; min-width: 0; background: var(--bg2);
+  border: 1px solid var(--edge); border-radius: var(--r);
+  display: flex; flex-direction: column; overflow: hidden;
 }
-.bank-tag{
-  font-size:.7rem;font-weight:600;padding:5px 12px;border-radius:999px;
-  border:1px solid var(--edge);background:var(--plate);color:var(--mist);
-  letter-spacing:.3px;
+.phead {
+  padding: 11px 16px; border-bottom: 1px solid var(--edge);
+  background: var(--surface); display: flex; align-items: center; justify-content: space-between;
 }
+.ptitle {
+  font-size: .71rem; font-weight: 700; letter-spacing: .9px;
+  text-transform: uppercase; color: var(--mist);
+  display: flex; align-items: center; gap: 7px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+.db { background: #3b82f6; } .dp { background: var(--v2); }
+.cw {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 14px; min-height: 200px;
+}
+.cw canvas { max-width: 100%; max-height: 560px; border-radius: 7px; display: block; }
 
-/* ── OVERLAY CONFIG ───────────────────────────── */
-.config-bar{
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-  background:var(--plate);border:1px solid var(--edge);
-  border-radius:var(--r);padding:15px 20px;margin-bottom:22px;
+/* INFO BOX */
+#info-box {
+  display: none; gap: 14px; flex-wrap: wrap;
+  margin-bottom: 18px;
 }
-.cfg-label{font-size:.75rem;font-weight:600;color:var(--mist);
-  letter-spacing:.5px;white-space:nowrap}
-.ov-thumb{
-  width:40px;height:40px;border-radius:7px;object-fit:cover;
-  border:1px solid var(--edge2);background:var(--plate2);flex-shrink:0;
+.info-card {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 9px; padding: 12px 16px;
+  display: flex; flex-direction: column; gap: 4px;
 }
-.cfg-input{
-  flex:1;min-width:160px;background:var(--plate2);border:1px solid var(--edge);
-  color:var(--snow);border-radius:7px;padding:9px 13px;
-  font-size:.8rem;font-family:'DM Mono',monospace;outline:none;transition:.18s;
-}
-.cfg-input:focus{border-color:var(--edge2);box-shadow:0 0 0 3px rgba(108,59,255,.12)}
-.btn{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:9px 18px;border-radius:8px;border:none;cursor:pointer;
-  font-family:'IBM Plex Sans Thai',sans-serif;font-size:.82rem;font-weight:600;
-  transition:all .18s;
-}
-.btn-v{background:var(--violet);color:#fff}
-.btn-v:hover{background:var(--indigo);box-shadow:0 0 16px var(--glow)}
-.btn-g{background:linear-gradient(135deg,#059669,var(--jade));color:#fff}
-.btn-g:hover{box-shadow:0 0 16px rgba(15,185,129,.4)}
-.btn-o{background:var(--plate2);color:var(--mist);border:1px solid var(--edge)}
-.btn-o:hover{color:var(--snow);border-color:var(--edge2)}
-.btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
-label.btn{cursor:pointer}
+.info-lbl { font-size: .68rem; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--mist); }
+.info-val { font-family: 'DM Mono', monospace; font-size: .88rem; color: var(--snow); }
+.info-val.g { color: var(--jade); }
+.info-val.p { color: var(--v3); }
 
-/* ── DROP ZONE ────────────────────────────────── */
-#drop{
-  border:2px dashed var(--edge2);border-radius:18px;
-  padding:60px 40px;text-align:center;cursor:pointer;
-  background:var(--ink2);position:relative;overflow:hidden;
-  transition:all .22s;margin-bottom:26px;
-}
-#drop::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(circle at 50% 60%,rgba(108,59,255,.055),transparent 68%);
-}
-#drop:hover,#drop.over{
-  border-color:var(--indigo);background:rgba(108,59,255,.07);
-  box-shadow:0 0 40px rgba(108,59,255,.13);
-}
-.drop-icon{font-size:3rem;margin-bottom:16px;opacity:.7}
-.drop-h{font-size:1.2rem;font-weight:700}
-.drop-s{color:var(--mist);font-size:.875rem;margin-top:8px}
-.drop-fmts{display:flex;gap:8px;justify-content:center;margin-top:16px}
-.fmt{
-  font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:1px;
-  background:var(--plate);border:1px solid var(--edge);
-  color:var(--mist);padding:3px 10px;border-radius:6px;
-}
-.btn-browse{
-  display:inline-flex;align-items:center;gap:8px;margin-top:20px;
-  background:linear-gradient(135deg,var(--violet),var(--indigo));
-  color:#fff;border:none;border-radius:999px;padding:12px 30px;
-  font-size:.88rem;font-weight:700;font-family:'IBM Plex Sans Thai',sans-serif;
-  cursor:pointer;transition:all .2s;box-shadow:0 4px 22px rgba(108,59,255,.38);
-}
-.btn-browse:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(108,59,255,.5)}
-#file-in{display:none}
+/* ACTIONS */
+#actions { display: none; gap: 10px; margin-bottom: 36px; flex-wrap: wrap; }
 
-/* ── STATUS ───────────────────────────────────── */
-#status{
-  display:none;align-items:center;gap:11px;
-  padding:13px 18px;border-radius:9px;margin-bottom:18px;
-  font-size:.84rem;border:1px solid;
+/* ZONE OVERLAY TOGGLE */
+.zone-toggle {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .8rem; color: var(--mist); cursor: pointer; user-select: none;
 }
-#status.proc{background:rgba(108,59,255,.08);border-color:var(--edge2);color:var(--lilac)}
-#status.ok  {background:rgba(15,185,129,.08);border-color:rgba(15,185,129,.28);color:var(--jade)}
-#status.warn{background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.28);color:var(--amber)}
-#status.err {background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.28);color:#f43f5e}
-.spin{
-  width:15px;height:15px;border-radius:50%;flex-shrink:0;
-  border:2px solid rgba(139,99,255,.2);border-top-color:var(--indigo);
-  animation:sp .65s linear infinite;
-}
-@keyframes sp{to{transform:rotate(360deg)}}
-#s-prog{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--fog);margin-left:auto}
+.zone-toggle input { accent-color: var(--v2); cursor: pointer; }
+.zone-toggle:hover { color: var(--snow); }
 
-/* ── CANVAS AREA ──────────────────────────────── */
-#canvas-area{display:none;gap:18px;margin-bottom:26px}
-.panel{
-  flex:1;min-width:0;background:var(--ink2);
-  border:1px solid var(--edge);border-radius:var(--r);
-  display:flex;flex-direction:column;overflow:hidden;
-}
-.phead{
-  padding:11px 16px;border-bottom:1px solid var(--edge);
-  background:var(--plate);display:flex;align-items:center;
-  justify-content:space-between;
-}
-.ptitle{
-  font-size:.72rem;font-weight:700;letter-spacing:.9px;
-  text-transform:uppercase;color:var(--mist);
-  display:flex;align-items:center;gap:7px;
-}
-.dot{width:7px;height:7px;border-radius:50%}
-.db{background:#3b82f6}.dp{background:var(--indigo)}
-.cw{
-  flex:1;display:flex;align-items:center;
-  justify-content:center;padding:14px;min-height:200px;
-}
-.cw canvas{max-width:100%;max-height:540px;border-radius:7px;display:block}
+@media (max-width: 720px) { #canvas-area { flex-direction: column; } }
 
-/* ── BADGES ───────────────────────────────────── */
-#badges{display:none;gap:9px;flex-wrap:wrap;margin-bottom:18px}
-.bdg{
-  display:flex;align-items:center;gap:6px;
-  padding:6px 13px;border-radius:999px;font-size:.72rem;
-  font-weight:700;border:1px solid;font-family:'DM Mono',monospace;
-}
-.bdg-q{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#60a5fa}
-.bdg-t{background:rgba(139,99,255,.1);border-color:rgba(139,99,255,.3);color:var(--lilac)}
-.bdg-w{background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.28);color:var(--amber)}
-
-/* ── ACTIONS ──────────────────────────────────── */
-#actions{display:none;gap:10px;margin-bottom:40px;flex-wrap:wrap}
-
-/* ── LOG ──────────────────────────────────────── */
-#log-wrap{
-  display:none;background:var(--ink2);border:1px solid var(--edge);
-  border-radius:var(--r);overflow:hidden;margin-bottom:36px;
-}
-.log-head{
-  padding:10px 16px;background:var(--plate);border-bottom:1px solid var(--edge);
-  font-size:.72rem;font-weight:700;letter-spacing:.9px;
-  text-transform:uppercase;color:var(--mist);cursor:pointer;
-  display:flex;align-items:center;justify-content:space-between;
-}
-#log-body{
-  padding:12px 16px;font-family:'DM Mono',monospace;
-  font-size:.75rem;color:var(--fog);line-height:1.8;
-  max-height:160px;overflow-y:auto;
-}
-#log-body span{display:block}
-#log-body .ok{color:var(--jade)}
-#log-body .warn{color:var(--amber)}
-#log-body .info{color:var(--lilac)}
-
-@media(max-width:720px){#canvas-area{flex-direction:column}}
-
-.fi{animation:fade .38s ease forwards}
-@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fi { animation: fi .35s ease forwards; }
+@keyframes fi { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-<div class="z">
+<div class="wrap">
 
-<!-- HEADER -->
 <header>
   <div class="brand">
-    <div class="brand-gem">🛡️</div>
-    <div class="brand-name">Slip<b>Shield</b></div>
+    <div class="gem">🛡️</div>
+    <div class="brand-name">KBank <span>SlipShield</span></div>
   </div>
-  <span class="pill">THAI BANK OCR ENGINE</span>
+  <span class="chip">FIXED-LAYOUT · NO OCR</span>
 </header>
 
-<!-- HERO -->
 <section class="hero">
-  <h1>Redact Thai Bank Slips<br><em>Automatically</em></h1>
-  <p>ตรวจจับและเบลอเฉพาะ <strong>ชื่อผู้รับเงิน</strong> อัตโนมัติ และแทนที่ QR code ด้วยโลโก้ของคุณ — ทำงานใน browser ทั้งหมด ไม่มีการส่งข้อมูลออก</p>
-  <div class="bank-row">
-    <span class="bank-tag">🟩 KBank / K+</span>
-    <span class="bank-tag">🟣 SCB</span>
-    <span class="bank-tag">🔵 Krungthai</span>
-    <span class="bank-tag">🟡 Krungsri</span>
-    <span class="bank-tag">🩷 GSB / MyMo</span>
+  <h1>Redact KBank <em>Transfer Slips</em></h1>
+  <p>เบลอชื่อผู้รับเงินและแทนที่ QR code ด้วย layout-based positioning — ไม่ใช้ OCR ทำงานใน browser ทั้งหมด</p>
+  <div class="tag-row">
+    <span class="tag active">🟩 KBank / K PLUS</span>
+    <span class="tag">Fixed Layout</span>
+    <span class="tag">No OCR</span>
+    <span class="tag">Canvas API</span>
   </div>
 </section>
 
 <!-- OVERLAY CONFIG -->
-<div class="config-bar">
-  <span class="cfg-label">QR OVERLAY</span>
+<div class="cfg-bar">
+  <span class="cfg-lbl">QR OVERLAY IMAGE</span>
   <img id="ov-thumb" class="ov-thumb" src="" alt="">
-  <input id="ov-url" class="cfg-input" type="text" placeholder="Paste image URL…">
-  <label class="btn btn-o">
-    📁 Local <input type="file" id="ov-file" accept="image/*" style="display:none">
-  </label>
+  <input id="ov-url" class="cfg-in" type="text" placeholder="Paste image URL…">
+  <label class="btn btn-o">📁 Local File <input type="file" id="ov-file" accept="image/*" style="display:none"></label>
   <button class="btn btn-v" id="ov-apply">Apply</button>
 </div>
 
 <!-- DROP ZONE -->
 <div id="drop">
   <div class="drop-icon">🧾</div>
-  <div class="drop-h">วาง slip ธนาคารที่นี่</div>
-  <div class="drop-s">หรือ คลิกเพื่อเลือกไฟล์</div>
-  <div class="drop-fmts">
+  <div class="drop-h">วาง KBank slip ที่นี่</div>
+  <div class="drop-s">หรือคลิกเพื่อเลือกไฟล์</div>
+  <div class="fmts">
     <span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span>
   </div>
-  <button class="btn-browse" id="browse">📂 เลือกไฟล์</button>
+  <button class="btn-browse" id="browse-btn">📂 เลือกไฟล์</button>
   <input type="file" id="file-in" accept="image/jpeg,image/png,image/webp">
 </div>
 
 <!-- STATUS -->
 <div id="status">
-  <div class="spin" id="spin"></div>
+  <span id="s-icon"></span>
   <span id="s-txt"></span>
-  <span id="s-prog"></span>
 </div>
 
-<!-- BADGES -->
-<div id="badges">
-  <span class="bdg bdg-q" id="b-qr"   style="display:none">📷 QR พบแล้ว — ใส่ Overlay</span>
-  <span class="bdg bdg-t" id="b-name" style="display:none">👤 เบลอชื่อ<b>ผู้รับเงิน</b>แล้ว</span>
-  <span class="bdg bdg-w" id="b-skip" style="display:none">⚠️ ไม่พบข้อมูลที่ต้องประมวลผล</span>
+<!-- INFO BOX -->
+<div id="info-box">
+  <div class="info-card">
+    <span class="info-lbl">Image Size</span>
+    <span class="info-val" id="inf-size">—</span>
+  </div>
+  <div class="info-card">
+    <span class="info-lbl">Receiver Zone</span>
+    <span class="info-val p" id="inf-recv">—</span>
+  </div>
+  <div class="info-card">
+    <span class="info-lbl">QR Zone</span>
+    <span class="info-val p" id="inf-qr">—</span>
+  </div>
+  <div class="info-card">
+    <span class="info-lbl">Status</span>
+    <span class="info-val g" id="inf-status">—</span>
+  </div>
+  <label class="zone-toggle" style="margin-left:auto">
+    <input type="checkbox" id="show-zones"> Show zones
+  </label>
 </div>
 
-<!-- CANVAS -->
+<!-- CANVAS AREA -->
 <div id="canvas-area">
   <div class="panel">
     <div class="phead">
-      <span class="ptitle"><span class="dot db"></span>ต้นฉบับ</span>
+      <span class="ptitle"><span class="dot db"></span>ต้นฉบับ (Original)</span>
     </div>
     <div class="cw"><canvas id="orig-c"></canvas></div>
   </div>
   <div class="panel">
     <div class="phead">
-      <span class="ptitle"><span class="dot dp"></span>ประมวลผลแล้ว</span>
-      <span style="font-size:.68rem;color:var(--fog);font-family:'DM Mono',monospace">ผู้รับเงินถูกเบลอ • QR ถูกแทนที่</span>
+      <span class="ptitle"><span class="dot dp"></span>ประมวลผลแล้ว (Processed)</span>
+      <span style="font-size:.67rem;color:var(--fog);font-family:'DM Mono',monospace">ผู้รับเงินถูกเบลอ • QR ถูกแทนที่</span>
     </div>
     <div class="cw"><canvas id="out-c"></canvas></div>
   </div>
@@ -325,109 +301,114 @@ label.btn{cursor:pointer}
   <button class="btn btn-o" id="reset-btn">✕ เริ่มใหม่</button>
 </div>
 
-<!-- DEBUG LOG -->
-<div id="log-wrap">
-  <div class="log-head" id="log-toggle">
-    🔍 Detection Log <span id="log-arrow">▼</span>
-  </div>
-  <div id="log-body"></div>
-</div>
+</div><!-- /wrap -->
 
-</div><!-- /z -->
 <script>
-/* ══════════════════════════════════════════════
+/* ═══════════════════════════════════════════════
+   KBANK SLIP LAYOUT — FIXED PERCENTAGES
+   Based on standard KBank / K PLUS slip structure
+═══════════════════════════════════════════════ */
+const LAYOUT = {
+  receiver: {
+    x: 0.20,   // 20% from left
+    y: 0.455,  // 45.5% from top  ← receiver name sits here (below arrow)
+    w: 0.60,   // 60% wide
+    h: 0.065,  // 6.5% tall
+  },
+  qr: {
+    x: 0.62,   // 62% from left
+    y: 0.595,  // 59.5% from top
+    w: 0.30,   // 30% wide
+    h: 0.30,   // 30% tall (square)
+  },
+};
+
+/* ═══════════════════════════════════════════════
    STATE
-══════════════════════════════════════════════ */
-let overlayImg = null;
-let logs = [];
+═══════════════════════════════════════════════ */
+let overlayImg  = null;
+let currentImg  = null;
+let showZones   = false;
 
-/* ══════════════════════════════════════════════
-   OVERLAY SETUP
-══════════════════════════════════════════════ */
-const ovThumb  = document.getElementById('ov-thumb');
-const ovUrl    = document.getElementById('ov-url');
-const ovFile   = document.getElementById('ov-file');
-const ovApply  = document.getElementById('ov-apply');
+/* ═══════════════════════════════════════════════
+   ELEMENTS
+═══════════════════════════════════════════════ */
+const drop      = document.getElementById('drop');
+const fileIn    = document.getElementById('file-in');
+const browseBtn = document.getElementById('browse-btn');
+const statusEl  = document.getElementById('status');
+const sTxt      = document.getElementById('s-txt');
+const sIcon     = document.getElementById('s-icon');
+const caArea    = document.getElementById('canvas-area');
+const origC     = document.getElementById('orig-c');
+const outC      = document.getElementById('out-c');
+const origX     = origC.getContext('2d');
+const outX      = outC.getContext('2d');
+const infoBox   = document.getElementById('info-box');
+const actions   = document.getElementById('actions');
+const dlBtn     = document.getElementById('dl-btn');
+const resetBtn  = document.getElementById('reset-btn');
+const ovThumb   = document.getElementById('ov-thumb');
+const ovUrl     = document.getElementById('ov-url');
+const ovFile    = document.getElementById('ov-file');
+const ovApply   = document.getElementById('ov-apply');
+const showZonesChk = document.getElementById('show-zones');
+const infSize   = document.getElementById('inf-size');
+const infRecv   = document.getElementById('inf-recv');
+const infQR     = document.getElementById('inf-qr');
+const infStatus = document.getElementById('inf-status');
 
-function setOverlay(src) {
+/* ═══════════════════════════════════════════════
+   OVERLAY IMAGE SETUP
+═══════════════════════════════════════════════ */
+function loadOverlay(src) {
   const img = new Image();
   img.crossOrigin = 'anonymous';
-  img.onload = () => { overlayImg = img; ovThumb.src = img.src; };
+  img.onload = () => { overlayImg = img; ovThumb.src = img.src; if (currentImg) render(); };
   img.onerror = () => {
-    // generate fallback canvas overlay
-    const fc = document.createElement('canvas');
-    fc.width = 200; fc.height = 200;
+    /* fallback: purple circle with IX */
+    const fc = document.createElement('canvas'); fc.width = fc.height = 200;
     const fx = fc.getContext('2d');
-    fx.fillStyle = '#6c3bff';
+    fx.fillStyle = '#6b38ff';
     fx.beginPath(); fx.arc(100,100,100,0,Math.PI*2); fx.fill();
-    fx.fillStyle = '#fff';
-    fx.font = 'bold 68px sans-serif';
-    fx.textAlign = 'center'; fx.textBaseline = 'middle';
-    fx.fillText('IX', 100, 105);
+    fx.fillStyle = '#fff'; fx.font = 'bold 72px sans-serif';
+    fx.textAlign = 'center'; fx.textBaseline = 'middle'; fx.fillText('IX',100,105);
     const fi = new Image();
     fi.src = fc.toDataURL();
-    fi.onload = () => { overlayImg = fi; ovThumb.src = fi.src; };
+    fi.onload = () => { overlayImg = fi; ovThumb.src = fi.src; if (currentImg) render(); };
   };
   img.src = src;
 }
 
-// Try to load uploaded logo first
+/* Try loading INSIDEX logo first, fallback to placeholder */
 (async () => {
   try {
     const r = await fetch('/mnt/user-data/uploads/412.png');
     if (!r.ok) throw 0;
     const blob = await r.blob();
     const reader = new FileReader();
-    reader.onload = e => { setOverlay(e.target.result); ovUrl.value = '(INSIDEX logo)'; };
+    reader.onload = e => { loadOverlay(e.target.result); ovUrl.value = '(INSIDEX logo)'; };
     reader.readAsDataURL(blob);
   } catch {
-    setOverlay('https://via.placeholder.com/150/6c3bff/ffffff?text=IX');
+    loadOverlay('https://via.placeholder.com/150/6b38ff/ffffff?text=IX');
   }
 })();
 
 ovApply.addEventListener('click', () => {
   const v = ovUrl.value.trim();
-  if (v && !v.startsWith('(')) setOverlay(v);
+  if (v && !v.startsWith('(')) loadOverlay(v);
 });
-ovUrl.addEventListener('keydown', e => { if (e.key==='Enter') ovApply.click(); });
+ovUrl.addEventListener('keydown', e => { if (e.key === 'Enter') ovApply.click(); });
 ovFile.addEventListener('change', () => {
   const f = ovFile.files[0]; if (!f) return;
   const r = new FileReader();
-  r.onload = e => { setOverlay(e.target.result); ovUrl.value = f.name; };
+  r.onload = e => { loadOverlay(e.target.result); ovUrl.value = f.name; };
   r.readAsDataURL(f);
 });
 
-/* ══════════════════════════════════════════════
-   ELEMENTS
-══════════════════════════════════════════════ */
-const drop     = document.getElementById('drop');
-const fileIn   = document.getElementById('file-in');
-const browseB  = document.getElementById('browse');
-const statusEl = document.getElementById('status');
-const sTxt     = document.getElementById('s-txt');
-const sProg    = document.getElementById('s-prog');
-const spinEl   = document.getElementById('spin');
-const caArea   = document.getElementById('canvas-area');
-const origC    = document.getElementById('orig-c');
-const outC     = document.getElementById('out-c');
-const origX    = origC.getContext('2d');
-const outX     = outC.getContext('2d');
-const badges   = document.getElementById('badges');
-const bQR      = document.getElementById('b-qr');
-const bName    = document.getElementById('b-name');
-const bSkip    = document.getElementById('b-skip');
-const bN       = document.getElementById('b-n');
-const actions  = document.getElementById('actions');
-const dlBtn    = document.getElementById('dl-btn');
-const resetBtn = document.getElementById('reset-btn');
-const logWrap  = document.getElementById('log-wrap');
-const logBody  = document.getElementById('log-body');
-const logToggle= document.getElementById('log-toggle');
-const logArrow = document.getElementById('log-arrow');
-
-/* ══════════════════════════════════════════════
-   DRAG & DROP
-══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   DRAG & DROP / FILE PICKER
+═══════════════════════════════════════════════ */
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', e => {
@@ -436,381 +417,246 @@ drop.addEventListener('drop', e => {
   if (f && f.type.startsWith('image/')) loadSlip(f);
 });
 drop.addEventListener('click', () => fileIn.click());
-browseB.addEventListener('click', e => { e.stopPropagation(); fileIn.click(); });
+browseBtn.addEventListener('click', e => { e.stopPropagation(); fileIn.click(); });
 fileIn.addEventListener('change', () => { if (fileIn.files[0]) loadSlip(fileIn.files[0]); });
 
-/* ══════════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    LOAD SLIP
-══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ */
 function loadSlip(file) {
   const r = new FileReader();
   r.onload = e => {
     const img = new Image();
-    img.onload = () => startProcess(img);
+    img.onload = () => {
+      currentImg = img;
+      setupCanvases(img);
+      render();
+      showUI();
+    };
     img.src = e.target.result;
   };
   r.readAsDataURL(file);
 }
 
-/* ══════════════════════════════════════════════
-   MAIN PROCESS
-══════════════════════════════════════════════ */
-async function startProcess(img) {
-  logs = [];
-  drop.style.display = 'none';
-  caArea.style.display = 'flex'; caArea.classList.add('fi');
-  actions.style.display = 'flex';
-  badges.style.display = 'flex';
-  logWrap.style.display = 'block';
-  dlBtn.disabled = true;
-  bQR.style.display = bName.style.display = bSkip.style.display = 'none';
-
+function setupCanvases(img) {
   const W = img.naturalWidth, H = img.naturalHeight;
   origC.width = outC.width = W;
   origC.height = outC.height = H;
   origX.drawImage(img, 0, 0);
-  outX.drawImage(img, 0, 0);
+}
 
-  addLog('info', `ขนาดภาพ: ${W}×${H}px`);
+/* ═══════════════════════════════════════════════
+   COMPUTE LAYOUT RECTS  (all clamped to canvas bounds)
+═══════════════════════════════════════════════ */
+function getReceiverRect(W, H) {
+  const x = Math.round(clamp(LAYOUT.receiver.x * W, 0, W));
+  const y = Math.round(clamp(LAYOUT.receiver.y * H, 0, H));
+  const w = Math.round(clamp(LAYOUT.receiver.w * W, 1, W - x));
+  const h = Math.round(clamp(LAYOUT.receiver.h * H, 1, H - y));
+  return { x, y, w, h };
+}
 
-  /* ── 1. QR DETECTION ── */
-  setStatus('proc', '🔍 กำลังสแกน QR Code…');
-  let qrRegion = null;
-  try {
-    const tmp = document.createElement('canvas');
-    tmp.width = W; tmp.height = H;
-    const tx = tmp.getContext('2d');
-    tx.drawImage(img, 0, 0);
-    const id = tx.getImageData(0, 0, W, H);
-    const qr = jsQR(id.data, id.width, id.height, { inversionAttempts: 'attemptBoth' });
-    if (qr) {
-      const { topLeftCorner:tl, topRightCorner:tr, bottomLeftCorner:bl, bottomRightCorner:br } = qr.location;
-      const xs = [tl.x,tr.x,bl.x,br.x], ys = [tl.y,tr.y,bl.y,br.y];
-      const mx=Math.min(...xs), my=Math.min(...ys);
-      qrRegion = { x:mx, y:my, w:Math.max(...xs)-mx, h:Math.max(...ys)-my };
-      addLog('ok', `QR พบที่ (${Math.round(mx)},${Math.round(my)}) ขนาด ${Math.round(qrRegion.w)}×${Math.round(qrRegion.h)}`);
-    } else {
-      addLog('warn', 'ไม่พบ QR Code');
-    }
-  } catch(e) { addLog('warn', 'QR scan error: ' + e.message); }
+function getQRRect(W, H) {
+  const x = Math.round(clamp(LAYOUT.qr.x * W, 0, W));
+  const y = Math.round(clamp(LAYOUT.qr.y * H, 0, H));
+  const w = Math.round(clamp(LAYOUT.qr.w * W, 1, W - x));
+  const h = Math.round(clamp(LAYOUT.qr.h * H, 1, H - y));
+  return { x, y, w, h };
+}
 
-  /* ── 2. OCR ── */
-  setStatus('proc', '🔤 OCR กำลังอ่านข้อความภาษาไทย/อังกฤษ…', '0%');
-  let nameRegions = [];
-  try {
-    const { data } = await Tesseract.recognize(origC, 'tha+eng', {
-      logger: m => {
-        if (m.status === 'recognizing text')
-          sProg.textContent = Math.round(m.progress * 100) + '%';
-      }
-    });
-    sProg.textContent = '';
-    addLog('info', `OCR พบ ${data.lines.length} บรรทัด, confidence เฉลี่ย ${Math.round(data.confidence)}%`);
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-    nameRegions = extractNameRegions(data, W, H);
-    addLog(nameRegions.length > 0 ? 'ok' : 'warn',
-      nameRegions.length > 0
-        ? `พบ candidate ผู้รับ ${nameRegions.length} รายการ — เลือก Y ต่ำสุด`
-        : 'ไม่พบชื่อผู้รับในโซนที่กำหนด');
-    nameRegions.forEach((r,i) =>
-      addLog('info', `  candidate#${i+1}: "${r.text}" Y=${Math.round(r.y)} score=${r.score}`)
-    );
-  } catch(e) { addLog('warn', 'OCR error: ' + e.message); }
+/* ═══════════════════════════════════════════════
+   RENDER PROCESSED IMAGE
+═══════════════════════════════════════════════ */
+function render() {
+  if (!currentImg) return;
+  const W = currentImg.naturalWidth, H = currentImg.naturalHeight;
 
-  /* ── 3. RENDER — blur ONLY the single receiver (lowest name) ── */
-  outX.drawImage(img, 0, 0);
-  const receiver = nameRegions.length > 0
-    ? nameRegions.reduce((bot, r) => (r.y + r.h > bot.y + bot.h ? r : bot))
-    : null;
-  if (receiver) {
-    blurRect(outX, receiver.x - 6, receiver.y - 4, receiver.w + 12, receiver.h + 8, 22);
-    addLog('ok', `เบลอผู้รับ: "${receiver.text}" Y=${Math.round(receiver.y)}`);
+  /* fresh draw */
+  outX.drawImage(currentImg, 0, 0);
+
+  const recv = getReceiverRect(W, H);
+  const qr   = getQRRect(W, H);
+
+  /* ── 1. Blur receiver name ── */
+  blurRect(outX, recv.x, recv.y, recv.w, recv.h, 24);
+
+  /* ── 2. QR overlay ── */
+  drawQROverlay(outX, qr);
+
+  /* ── 3. Optional zone outlines for debugging ── */
+  if (showZones) {
+    drawZoneOutline(outX, recv, '#f59e0b', 'RECEIVER');
+    drawZoneOutline(outX, qr,  '#3b82f6', 'QR');
   }
-  if (qrRegion) drawOverlay(outX, qrRegion);
 
-  /* ── 4. BADGES ── */
-  const found = qrRegion || receiver;
-  bQR.style.display   = qrRegion  ? 'flex' : 'none';
-  bName.style.display = receiver  ? 'flex' : 'none';
-  bSkip.style.display = !found    ? 'flex' : 'none';
-  bN.textContent = receiver ? 1 : 0;
-
-  dlBtn.disabled = false;
-  setStatus(found ? 'ok' : 'warn',
-    found
-      ? `✅ เสร็จสิ้น — ${receiver ? 'เบลอชื่อผู้รับแล้ว' : ''}${receiver && qrRegion ? ', ' : ''}${qrRegion ? 'QR ถูกแทนที่' : ''}`
-      : '⚠️ ไม่พบชื่อผู้รับหรือ QR บนภาพนี้'
-  );
-  renderLog();
+  /* Update info cards */
+  infSize.textContent  = `${W} × ${H} px`;
+  infRecv.textContent  = `(${recv.x}, ${recv.y}) ${recv.w}×${recv.h}`;
+  infQR.textContent    = `(${qr.x}, ${qr.y}) ${qr.w}×${qr.h}`;
+  infStatus.textContent = '✅ Processed';
 }
 
-/* ══════════════════════════════════════════════
-   NAME EXTRACTION — RECEIVER-ONLY HEURISTICS
-   Strategy:
-   1. Collect all candidate name lines (scored)
-   2. Identify receiver anchor: lines with ผู้รับ/ไปยัง/to keywords
-   3. Prefer name lines BELOW the arrow/receiver keyword
-   4. If no anchor found, use lower half of image (below midpoint)
-   5. Return ALL qualifying candidates — caller picks the LOWEST one
-══════════════════════════════════════════════ */
-function extractNameRegions(data, imgW, imgH) {
-  const results = [];
-
-  /* ── FILTERS ── */
-  const isJunk = s => {
-    const t = s.trim();
-    if (t.length < 2) return true;
-    if (/^[\d\s.,\-/+:฿()]+$/.test(t)) return true;        // pure numbers/symbols
-    if (/x{3,}|X{3,}|\*{4,}/.test(t)) return true;          // masked account
-    if (/\d{3,}[-\s]\d/.test(t)) return true;                // account-like
-    if (/\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/.test(t)) return true; // date
-    if (/\d{1,2}:\d{2}/.test(t)) return true;                // time
-    if (/^[\d,]+(\.\d{2})?$/.test(t.replace(/\s/g,''))) return true;   // amount
-    if (/REF|TXN|TRANS|รายการ|อ้างอิง|หมายเลข|เลขที่/i.test(t)) return true;
-    if (/ธนาคาร|BANK|บัญชี|ACCOUNT|สาขา|BRANCH/i.test(t)) return true;
-    if (/SCB|KTB|BBL|BAY|TTB|UOB|CIMB|KBANK|TMB|GSB/i.test(t)) return true;
-    if (/[:：]$/.test(t)) return true;                       // label ending colon
-    if ((t.match(/\d/g)||[]).length / t.length > 0.35) return true; // number-heavy
-    return false;
-  };
-
-  const isNameLike = s => {
-    const t = s.trim();
-    if (/^[ก-๛][ก-๛\s]{2,}$/.test(t) && !/\d/.test(t)) return true;  // pure Thai
-    if (/^[A-Z][a-z]+([\s\-][A-Z][a-z]+)+$/.test(t)) return true;      // Firstname Lastname
-    if (/^[A-Z]{2,}(\s[A-Z]{2,})+$/.test(t)) return true;              // ALL CAPS name
-    if (/[ก-๛]{2,}/.test(t) && t.length <= 40 && !/\d/.test(t)) return true; // Thai mixed
-    return false;
-  };
-
-  /* ── PASS 1: find receiver-keyword anchor Y positions ──
-     Keywords: ผู้รับ, ไปยัง, โอนไป, to, receiver, ▼, →
-     Arrow icons often appear as lines containing only symbols
-  */
-  const RECV_KW = /ผู้รับ|ผู้รับเงิน|ไปยัง|โอนไป|receiver|to\s*:/i;
-  const SEND_KW = /ผู้โอน|โอนจาก|จาก|from\s*:/i;
-  const ARROW   = /^[\s▼↓→➜➡⬇\-–—|]{0,4}$/;
-
-  let receiverAnchorY = null;  // Y below which receiver name lives
-  let senderAnchorY   = null;
-
-  data.lines.forEach(line => {
-    const t = line.text.trim();
-    if (RECV_KW.test(t)) {
-      const y = line.bbox.y1; // bottom of keyword line
-      if (receiverAnchorY === null || y > receiverAnchorY) receiverAnchorY = y;
-      addLog('info', `  ผู้รับ-anchor Y=${Math.round(y)} "${t}"`);
-    }
-    if (SEND_KW.test(t)) {
-      const y = line.bbox.y1;
-      if (senderAnchorY === null || y < senderAnchorY) senderAnchorY = y;
-      addLog('info', `  ผู้โอน-anchor Y=${Math.round(y)} "${t}"`);
-    }
-    // Arrow symbols often mark the divider
-    if (ARROW.test(t) && t.length > 0) {
-      const y = line.bbox.y1;
-      if (receiverAnchorY === null || y > receiverAnchorY) {
-        // only use arrow as anchor if it's in middle area (20%-70%)
-        const relY = line.bbox.y0 / imgH;
-        if (relY >= 0.2 && relY <= 0.7) {
-          receiverAnchorY = y;
-          addLog('info', `  arrow-anchor Y=${Math.round(y)} "${t}"`);
-        }
-      }
-    }
-  });
-
-  // Fallback: if no keyword found, receiver zone = lower 45% of image
-  const recvZoneTop = receiverAnchorY !== null
-    ? receiverAnchorY
-    : imgH * 0.42;
-
-  addLog('info', `  Receiver zone starts at Y=${Math.round(recvZoneTop)} (${Math.round(recvZoneTop/imgH*100)}%)`);
-
-  /* ── PASS 2: score every line, only accept those in receiver zone ── */
-  const avgLineH = imgH / 38;
-
-  data.lines.forEach((line, li) => {
-    const raw = line.text.trim();
-    if (isJunk(raw)) return;
-    if (line.confidence < 15) return;
-
-    const { x0, y0, x1, y1 } = line.bbox;
-    const lineH  = y1 - y0;
-    const relY   = y0 / imgH;
-
-    // Must be in receiver zone (below anchor)
-    if (y0 < recvZoneTop - lineH * 0.5) {
-      addLog('info', `  [${li}] SKIP (above recv zone Y=${Math.round(y0)}) "${raw.substring(0,25)}"`);
-      return;
-    }
-    // Don't go too low (last 10% = footer/timestamp)
-    if (relY > 0.90) return;
-
-    let score = 0;
-    const reason = [];
-
-    // Font size — larger = more likely a name
-    if (lineH > avgLineH * 1.5) { score += 35; reason.push('large'); }
-    else if (lineH > avgLineH * 1.1) { score += 18; reason.push('med'); }
-
-    // Name pattern
-    if (isNameLike(raw)) { score += 50; reason.push('name-pattern'); }
-
-    // Proximity to receiver keyword (within 3 lines)
-    if (receiverAnchorY !== null) {
-      const dist = y0 - receiverAnchorY;
-      if (dist >= 0 && dist < lineH * 4) { score += 40; reason.push('near-recv-kw'); }
-      else if (dist >= 0 && dist < lineH * 8) { score += 20; reason.push('close-recv'); }
-    }
-
-    // Horizontal — names are not edge-to-edge
-    const lw = x1 - x0;
-    if (lw > imgW * 0.88) { score -= 25; reason.push('too-wide'); }
-    if (lw < imgW * 0.05) { score -= 20; reason.push('too-narrow'); }
-
-    addLog('info', `  [${li}] score=${score} Y=${Math.round(y0)} "${raw.substring(0,28)}" [${reason.join(',')}]`);
-
-    if (score >= 40) {
-      results.push({ x:x0, y:y0, w:x1-x0, h:y1-y0,
-        text:raw, score, conf:line.confidence });
-    }
-  });
-
-  return results; // caller will pick the single lowest one
-}
-
-/* Remove heavily overlapping regions */
-function dedup(regions) {
-  const keep = [];
-  for (const r of regions) {
-    const overlaps = keep.some(k => {
-      const ix = Math.max(0, Math.min(r.x+r.w, k.x+k.w) - Math.max(r.x, k.x));
-      const iy = Math.max(0, Math.min(r.y+r.h, k.y+k.h) - Math.max(r.y, k.y));
-      const inter = ix * iy;
-      const union = r.w*r.h + k.w*k.h - inter;
-      return inter / union > 0.4;
-    });
-    if (!overlaps) keep.push(r);
-  }
-  return keep;
-}
-
-/* ══════════════════════════════════════════════
-   BLUR (double-pass box blur)
-══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   BLUR — triple-pass box blur (smooth, high quality)
+═══════════════════════════════════════════════ */
 function blurRect(ctx, x, y, w, h, rad) {
-  x = Math.max(0, Math.round(x));
-  y = Math.max(0, Math.round(y));
-  w = Math.min(ctx.canvas.width  - x, Math.round(w));
-  h = Math.min(ctx.canvas.height - y, Math.round(h));
+  x = Math.max(0, x); y = Math.max(0, y);
+  w = Math.min(ctx.canvas.width  - x, w);
+  h = Math.min(ctx.canvas.height - y, h);
   if (w <= 0 || h <= 0) return;
+
   const id = ctx.getImageData(x, y, w, h);
-  _boxBlur(id, rad); _boxBlur(id, rad); _boxBlur(id, Math.round(rad*0.6));
+  boxBlurPass(id, rad);
+  boxBlurPass(id, rad);
+  boxBlurPass(id, Math.round(rad * 0.7));
   ctx.putImageData(id, x, y);
 }
 
-function _boxBlur(id, rad) {
-  const { data:d, width:W, height:H } = id;
-  const r2 = rad*2+1;
+function boxBlurPass(id, rad) {
+  const { data: d, width: W, height: H } = id;
+  const r2 = rad * 2 + 1;
   const buf = new Uint8ClampedArray(d.length);
-  for (let row=0;row<H;row++){
-    let rs=0,gs=0,bs=0,as=0; const rb=row*W*4;
-    for(let k=-rad;k<=rad;k++){const c=Math.max(0,Math.min(W-1,k))*4+rb;rs+=d[c];gs+=d[c+1];bs+=d[c+2];as+=d[c+3];}
-    for(let col=0;col<W;col++){
-      const i=rb+col*4;buf[i]=rs/r2;buf[i+1]=gs/r2;buf[i+2]=bs/r2;buf[i+3]=as/r2;
-      const ai=rb+Math.min(W-1,col+rad+1)*4,ri=rb+Math.max(0,col-rad)*4;
-      rs+=d[ai]-d[ri];gs+=d[ai+1]-d[ri+1];bs+=d[ai+2]-d[ri+2];as+=d[ai+3]-d[ri+3];
+
+  /* horizontal */
+  for (let row = 0; row < H; row++) {
+    let rs = 0, gs = 0, bs = 0, as = 0;
+    const rb = row * W * 4;
+    for (let k = -rad; k <= rad; k++) {
+      const c = clamp(k, 0, W - 1) * 4 + rb;
+      rs += d[c]; gs += d[c+1]; bs += d[c+2]; as += d[c+3];
+    }
+    for (let col = 0; col < W; col++) {
+      const i = rb + col * 4;
+      buf[i] = rs/r2; buf[i+1] = gs/r2; buf[i+2] = bs/r2; buf[i+3] = as/r2;
+      const ai = rb + clamp(col + rad + 1, 0, W-1) * 4;
+      const ri = rb + clamp(col - rad,     0, W-1) * 4;
+      rs += d[ai] - d[ri]; gs += d[ai+1] - d[ri+1];
+      bs += d[ai+2] - d[ri+2]; as += d[ai+3] - d[ri+3];
     }
   }
-  for(let col=0;col<W;col++){
-    let rs=0,gs=0,bs=0,as=0;
-    for(let k=-rad;k<=rad;k++){const r=Math.max(0,Math.min(H-1,k));const i=(r*W+col)*4;rs+=buf[i];gs+=buf[i+1];bs+=buf[i+2];as+=buf[i+3];}
-    for(let row=0;row<H;row++){
-      const i=(row*W+col)*4;d[i]=rs/r2;d[i+1]=gs/r2;d[i+2]=bs/r2;d[i+3]=as/r2;
-      const ai=(Math.min(H-1,row+rad+1)*W+col)*4,ri=(Math.max(0,row-rad)*W+col)*4;
-      rs+=buf[ai]-buf[ri];gs+=buf[ai+1]-buf[ri+1];bs+=buf[ai+2]-buf[ri+2];as+=buf[ai+3]-buf[ri+3];
+
+  /* vertical */
+  for (let col = 0; col < W; col++) {
+    let rs = 0, gs = 0, bs = 0, as = 0;
+    for (let k = -rad; k <= rad; k++) {
+      const r = clamp(k, 0, H - 1);
+      const i = (r * W + col) * 4;
+      rs += buf[i]; gs += buf[i+1]; bs += buf[i+2]; as += buf[i+3];
+    }
+    for (let row = 0; row < H; row++) {
+      const i = (row * W + col) * 4;
+      d[i] = rs/r2; d[i+1] = gs/r2; d[i+2] = bs/r2; d[i+3] = as/r2;
+      const ai = (clamp(row + rad + 1, 0, H-1) * W + col) * 4;
+      const ri = (clamp(row - rad,     0, H-1) * W + col) * 4;
+      rs += buf[ai] - buf[ri]; gs += buf[ai+1] - buf[ri+1];
+      bs += buf[ai+2] - buf[ri+2]; as += buf[ai+3] - buf[ri+3];
     }
   }
 }
 
-/* ══════════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    QR OVERLAY
-══════════════════════════════════════════════ */
-function drawOverlay(ctx, qr) {
-  const PAD = 0.08; // 8% padding inside QR
-  const ox = qr.x + qr.w * PAD;
-  const oy = qr.y + qr.h * PAD;
-  const ow = qr.w * (1 - PAD*2);
-  const oh = qr.h * (1 - PAD*2);
+═══════════════════════════════════════════════ */
+function drawQROverlay(ctx, qr) {
+  const PAD  = 0.08;
+  const ox   = qr.x + qr.w * PAD;
+  const oy   = qr.y + qr.h * PAD;
+  const ow   = qr.w * (1 - PAD * 2);
+  const oh   = qr.h * (1 - PAD * 2);
+  const cx   = ox + ow / 2;
+  const cy   = oy + oh / 2;
+  const cr   = Math.min(ow, oh) / 2;
 
-  // White circle background
+  /* white circle background */
   ctx.save();
   ctx.beginPath();
-  ctx.arc(ox + ow/2, oy + oh/2, Math.min(ow,oh)/2, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(255,255,255,0.94)';
+  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
   ctx.fill();
   ctx.restore();
 
   if (overlayImg) {
+    const SCALE = 0.82; // 82% of QR inner area
     const ar = overlayImg.naturalWidth / overlayImg.naturalHeight;
-    let dw = ow * 0.82, dh = oh * 0.82;
-    if (dw/dh > ar) dw = dh * ar; else dh = dw / ar;
-    const dx = ox + (ow-dw)/2;
-    const dy = oy + (oh-dh)/2;
+    let dw = ow * SCALE, dh = oh * SCALE;
+    if (dw / dh > ar) dw = dh * ar; else dh = dw / ar;
+    const dx = clamp(cx - dw / 2, qr.x, qr.x + qr.w - dw);
+    const dy = clamp(cy - dh / 2, qr.y, qr.y + qr.h - dh);
     ctx.drawImage(overlayImg, dx, dy, dw, dh);
   } else {
-    ctx.fillStyle = '#6c3bff';
-    ctx.font = `bold ${Math.round(oh*0.3)}px sans-serif`;
+    ctx.fillStyle = '#6b38ff';
+    ctx.font = `bold ${Math.round(oh * 0.32)}px sans-serif`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('IX', ox+ow/2, oy+oh/2);
+    ctx.fillText('IX', cx, cy);
   }
 }
 
-/* ══════════════════════════════════════════════
-   STATUS / LOG
-══════════════════════════════════════════════ */
-function setStatus(type, msg, prog) {
+/* ═══════════════════════════════════════════════
+   ZONE DEBUG OUTLINE
+═══════════════════════════════════════════════ */
+function drawZoneOutline(ctx, r, color, label) {
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, r.w * 0.008);
+  ctx.setLineDash([8, 4]);
+  ctx.strokeRect(r.x, r.y, r.w, r.h);
+  ctx.setLineDash([]);
+  ctx.fillStyle = color;
+  ctx.font = `bold ${Math.max(12, Math.round(r.h * 0.35))}px sans-serif`;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.globalAlpha = 0.85;
+  ctx.fillText(label, r.x + 4, r.y - 4);
+  ctx.restore();
+}
+
+/* ═══════════════════════════════════════════════
+   SHOW UI
+═══════════════════════════════════════════════ */
+function showUI() {
+  drop.style.display = 'none';
+  caArea.style.display = 'flex'; caArea.classList.add('fi');
+  infoBox.style.display = 'flex'; infoBox.classList.add('fi');
+  actions.style.display = 'flex';
+  dlBtn.disabled = false;
+  setStatus('ok', '✅ ประมวลผลเสร็จสิ้น — ชื่อผู้รับเงินถูกเบลอ, QR ถูกแทนที่');
+}
+
+function setStatus(type, msg) {
   statusEl.style.display = 'flex';
   statusEl.className = type;
   sTxt.textContent = msg;
-  if (prog) sProg.textContent = prog;
-  spinEl.style.display = type === 'proc' ? 'block' : 'none';
-  if (type !== 'proc') sProg.textContent = '';
 }
-function addLog(cls, msg) {
-  logs.push({ cls, msg });
-}
-function renderLog() {
-  logBody.innerHTML = logs.map(l =>
-    `<span class="${l.cls}">${l.msg}</span>`
-  ).join('');
-}
-logToggle.addEventListener('click', () => {
-  const open = logBody.style.display !== 'none';
-  logBody.style.display = open ? 'none' : 'block';
-  logArrow.textContent = open ? '▶' : '▼';
+
+/* ═══════════════════════════════════════════════
+   ZONE TOGGLE
+═══════════════════════════════════════════════ */
+showZonesChk.addEventListener('change', () => {
+  showZones = showZonesChk.checked;
+  if (currentImg) render();
 });
 
-/* ══════════════════════════════════════════════
+/* ═══════════════════════════════════════════════
    DOWNLOAD / RESET
-══════════════════════════════════════════════ */
+═══════════════════════════════════════════════ */
 dlBtn.addEventListener('click', () => {
   const a = document.createElement('a');
-  a.download = 'slipshield_processed.png';
+  a.download = 'kbank_slip_processed.png';
   a.href = outC.toDataURL('image/png');
   a.click();
 });
+
 resetBtn.addEventListener('click', () => {
+  currentImg = null;
   drop.style.display = 'block';
   caArea.style.display = 'none';
-  badges.style.display = 'none';
+  infoBox.style.display = 'none';
   actions.style.display = 'none';
   statusEl.style.display = 'none';
-  logWrap.style.display = 'none';
-  logBody.innerHTML = '';
   dlBtn.disabled = true;
   fileIn.value = '';
+  showZonesChk.checked = false;
+  showZones = false;
 });
 </script>
 </body>
