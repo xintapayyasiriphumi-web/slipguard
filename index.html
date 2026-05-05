@@ -3,100 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SlipShield — Auto Bank Detection</title>
+<title>SlipShield — Auto Detect + Adjustable</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#06060f;--bg2:#0b0b1d;--surf:#111128;--surf2:#191936;
-  --e:rgba(100,60,255,.15);--e2:rgba(100,60,255,.30);
-  --v:#6b38ff;--v2:#8b5cf6;--v3:#c4b5fd;
-  --glow:rgba(107,56,255,.42);--snow:#ede9ff;--mist:#786fa8;--fog:#383460;
-  --jade:#10b981;--amber:#f59e0b;--r:13px;
-}
+:root{--bg:#06060f;--bg2:#0b0b1d;--surf:#111128;--surf2:#191936;--e:rgba(100,60,255,.15);--e2:rgba(100,60,255,.30);--v:#6b38ff;--v2:#8b5cf6;--v3:#c4b5fd;--glow:rgba(107,56,255,.42);--snow:#ede9ff;--mist:#786fa8;--fog:#383460;--jade:#10b981;--amber:#f59e0b;--r:13px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'IBM Plex Sans Thai',system-ui,sans-serif;
-  background:var(--bg);color:var(--snow);min-height:100vh;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 12% 0%,rgba(107,56,255,.10) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 30% at 88% 100%,rgba(139,92,246,.07) 0%,transparent 55%);
-}
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
-}
+body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--snow);min-height:100vh;background-image:radial-gradient(ellipse 60% 40% at 12% 0%,rgba(107,56,255,.10) 0%,transparent 60%),radial-gradient(ellipse 50% 30% at 88% 100%,rgba(139,92,246,.07) 0%,transparent 55%)}
 .wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:0 26px}
-
-header{
-  padding:24px 0 20px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--e);
-}
+header{padding:24px 0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--e)}
 .brand{display:flex;align-items:center;gap:11px}
-.gem{
-  width:36px;height:36px;border-radius:9px;
-  background:linear-gradient(135deg,var(--v),var(--v2));
-  display:flex;align-items:center;justify-content:center;
-  font-size:17px;box-shadow:0 0 20px var(--glow);
-}
+.gem{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--v),var(--v2));display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 20px var(--glow)}
 .brand-name{font-size:1.2rem;font-weight:700;letter-spacing:-.4px}
 .brand-name span{color:var(--v3)}
-.chip{
-  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1.2px;
-  background:rgba(107,56,255,.12);border:1px solid var(--e2);
-  color:var(--v3);padding:4px 11px;border-radius:999px;
-}
-
-.hero{padding:36px 0 24px;text-align:center}
-.hero h1{font-size:clamp(1.8rem,3.6vw,2.8rem);font-weight:700;letter-spacing:-.5px;line-height:1.12}
+.chip{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1.2px;background:rgba(107,56,255,.12);border:1px solid var(--e2);color:var(--v3);padding:4px 11px;border-radius:999px}
+.hero{padding:32px 0 22px;text-align:center}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);font-weight:700;letter-spacing:-.5px;line-height:1.12}
 .hero h1 em{font-style:normal;color:var(--v3)}
-.hero p{color:var(--mist);margin-top:12px;max-width:520px;margin-inline:auto;font-size:.94rem;line-height:1.7}
-.tag-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-.tag{font-size:.7rem;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--e);background:var(--surf);color:var(--mist)}
+.hero p{color:var(--mist);margin-top:10px;max-width:540px;margin-inline:auto;font-size:.93rem;line-height:1.7}
+.tag-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.tag{font-size:.7rem;font-weight:600;padding:4px 12px;border-radius:999px;border:1px solid var(--e);background:var(--surf);color:var(--mist)}
 .tag.hi{background:rgba(107,56,255,.15);border-color:var(--e2);color:var(--v3)}
-
-/* ─── BANK SELECTOR ─── */
-.bank-select-bar{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  background:var(--surf);border:1px solid var(--e);
-  border-radius:var(--r);padding:14px 20px;margin-bottom:14px;
-}
+/* BANK SELECTOR */
+.bank-select-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surf);border:1px solid var(--e);border-radius:var(--r);padding:12px 18px;margin-bottom:12px}
 .bsb-label{font-size:.74rem;font-weight:700;color:var(--mist);letter-spacing:.5px;white-space:nowrap;flex-shrink:0}
-.bank-btns{display:flex;gap:7px;flex-wrap:wrap;flex:1}
-.bb{
-  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
-  border-radius:8px;border:1px solid var(--e);background:var(--surf2);
-  color:var(--mist);font-size:.77rem;font-weight:600;cursor:pointer;
-  font-family:'IBM Plex Sans Thai',sans-serif;transition:all .17s;
-}
+.bank-btns{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.bb{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:7px;border:1px solid var(--e);background:var(--surf2);color:var(--mist);font-size:.76rem;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans Thai',sans-serif;transition:all .17s}
 .bb:hover{border-color:var(--e2);color:var(--snow)}
 .bb.active{background:rgba(107,56,255,.20);border-color:var(--v2);color:var(--v3);box-shadow:0 0 10px rgba(107,56,255,.2)}
-.bb.auto-label{background:rgba(16,185,129,.10);border-color:rgba(16,185,129,.3);color:var(--jade)}
-.detect-badge{
-  display:none;align-items:center;gap:7px;margin-left:auto;font-size:.75rem;
-  color:var(--jade);background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);
-  border-radius:7px;padding:5px 12px;
-}
+.detect-badge{display:none;align-items:center;gap:6px;margin-left:auto;font-size:.74rem;color:var(--jade);background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:7px;padding:5px 11px}
 .detect-badge.show{display:flex}
-
-/* ─── OVERLAY CONFIG ─── */
-.cfg-bar{
-  display:flex;align-items:center;gap:13px;flex-wrap:wrap;
-  background:var(--surf);border:1px solid var(--e);
-  border-radius:var(--r);padding:14px 20px;margin-bottom:22px;
-}
+/* ADJUSTMENT PANEL */
+.adj-panel{display:none;background:var(--surf);border:1px solid var(--e);border-radius:var(--r);padding:16px 18px;margin-bottom:12px}
+.adj-panel.show{display:block}
+.adj-title{font-size:.74rem;font-weight:700;color:var(--v3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.adj-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.adj-section{background:var(--surf2);border:1px solid var(--e);border-radius:9px;padding:13px 15px}
+.adj-sec-title{font-size:.68rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:11px}
+.adj-amber{color:var(--amber)}
+.adj-blue{color:#60a5fa}
+.adj-rows{display:flex;flex-direction:column;gap:9px}
+.adj-row{display:flex;align-items:center;gap:9px}
+.adj-lbl{font-size:.69rem;color:var(--mist);font-family:'DM Mono',monospace;width:22px;flex-shrink:0}
+.adj-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:4px;background:var(--e2);outline:none;cursor:pointer}
+.adj-slider::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--v2);cursor:pointer}
+.adj-slider.amber::-webkit-slider-thumb{background:var(--amber)}
+.adj-slider.blue::-webkit-slider-thumb{background:#60a5fa}
+.adj-val{font-size:.67rem;font-family:'DM Mono',monospace;color:var(--snow);width:34px;text-align:right;flex-shrink:0}
+.adj-footer{display:flex;gap:8px;margin-top:10px}
+.adj-reset{display:inline-flex;align-items:center;gap:4px;font-size:.71rem;color:var(--mist);cursor:pointer;background:none;border:1px solid var(--e);border-radius:6px;padding:4px 9px;font-family:'IBM Plex Sans Thai',sans-serif;transition:.15s}
+.adj-reset:hover{color:var(--snow);border-color:var(--e2)}
+/* OVERLAY CFG */
+.cfg-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surf);border:1px solid var(--e);border-radius:var(--r);padding:13px 18px;margin-bottom:20px}
 .cfg-lbl{font-size:.74rem;font-weight:600;color:var(--mist);letter-spacing:.5px;white-space:nowrap}
-.ov-thumb{width:40px;height:40px;border-radius:7px;object-fit:cover;border:1px solid var(--e2);background:var(--surf2);flex-shrink:0}
-.cfg-in{
-  flex:1;min-width:160px;background:var(--surf2);border:1px solid var(--e);
-  color:var(--snow);border-radius:7px;padding:9px 13px;
-  font-size:.8rem;font-family:'DM Mono',monospace;outline:none;transition:.18s;
-}
+.ov-thumb{width:38px;height:38px;border-radius:7px;object-fit:cover;border:1px solid var(--e2);background:var(--surf2);flex-shrink:0}
+.cfg-in{flex:1;min-width:160px;background:var(--surf2);border:1px solid var(--e);color:var(--snow);border-radius:7px;padding:8px 12px;font-size:.8rem;font-family:'DM Mono',monospace;outline:none;transition:.18s}
 .cfg-in:focus{border-color:var(--e2);box-shadow:0 0 0 3px rgba(107,56,255,.12)}
-.btn{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:9px 18px;border-radius:8px;border:none;cursor:pointer;
-  font-family:'IBM Plex Sans Thai',sans-serif;font-size:.82rem;font-weight:600;transition:all .18s;
-}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'IBM Plex Sans Thai',sans-serif;font-size:.81rem;font-weight:600;transition:all .18s}
 .bv{background:var(--v);color:#fff}
 .bv:hover{background:var(--v2);box-shadow:0 0 16px var(--glow)}
 .bg{background:linear-gradient(135deg,#059669,var(--jade));color:#fff}
@@ -105,71 +67,42 @@ header{
 .bo:hover{color:var(--snow);border-color:var(--e2)}
 .btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
 label.btn{cursor:pointer}
-
-/* ─── DROP ZONE ─── */
-#drop{
-  border:2px dashed var(--e2);border-radius:18px;
-  padding:58px 40px;text-align:center;cursor:pointer;
-  background:var(--bg2);position:relative;overflow:hidden;
-  transition:all .22s;margin-bottom:24px;
-}
-#drop::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(circle at 50% 55%,rgba(107,56,255,.055),transparent 65%);
-}
+/* DROP */
+#drop{border:2px dashed var(--e2);border-radius:18px;padding:52px 40px;text-align:center;cursor:pointer;background:var(--bg2);position:relative;overflow:hidden;transition:all .22s;margin-bottom:22px}
+#drop::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 55%,rgba(107,56,255,.055),transparent 65%)}
 #drop:hover,#drop.over{border-color:var(--v2);background:rgba(107,56,255,.07);box-shadow:0 0 40px rgba(107,56,255,.12)}
-.di{font-size:2.8rem;margin-bottom:14px;opacity:.7}
-.dh{font-size:1.15rem;font-weight:700}
+.di{font-size:2.8rem;margin-bottom:12px;opacity:.7}
+.dh{font-size:1.12rem;font-weight:700}
 .ds{color:var(--mist);font-size:.875rem;margin-top:7px}
-.fmts{display:flex;gap:8px;justify-content:center;margin-top:15px}
-.fmt{font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:1px;background:var(--surf);border:1px solid var(--e);color:var(--mist);padding:3px 10px;border-radius:5px}
-.btn-br{
-  display:inline-flex;align-items:center;gap:8px;margin-top:18px;
-  background:linear-gradient(135deg,var(--v),var(--v2));
-  color:#fff;border:none;border-radius:999px;padding:11px 28px;
-  font-size:.87rem;font-weight:700;font-family:'IBM Plex Sans Thai',sans-serif;
-  cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(107,56,255,.36);
-}
+.fmts{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.fmt{font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:1px;background:var(--surf);border:1px solid var(--e);color:var(--mist);padding:3px 9px;border-radius:5px}
+.btn-br{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:linear-gradient(135deg,var(--v),var(--v2));color:#fff;border:none;border-radius:999px;padding:10px 26px;font-size:.87rem;font-weight:700;font-family:'IBM Plex Sans Thai',sans-serif;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(107,56,255,.36)}
 .btn-br:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(107,56,255,.48)}
 #file-in{display:none}
-
-/* ─── STATUS ─── */
-#status{
-  display:none;align-items:center;gap:11px;
-  padding:12px 17px;border-radius:9px;margin-bottom:18px;
-  font-size:.83rem;border:1px solid;
-}
+#status{display:none;align-items:center;gap:11px;padding:11px 16px;border-radius:9px;margin-bottom:16px;font-size:.83rem;border:1px solid}
 #status.ok{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.28);color:var(--jade)}
 #status.warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.28);color:var(--amber)}
-
-/* ─── INFO CARDS ─── */
-#info-box{display:none;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-.ic{background:var(--surf);border:1px solid var(--e);border-radius:9px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+#debug-bar{display:none;background:var(--surf);border:1px solid var(--e);border-radius:9px;padding:10px 15px;margin-bottom:15px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--mist);line-height:1.8}
+#debug-bar.show{display:block}
+#debug-bar strong{color:var(--v3)}
+#info-box{display:none;gap:11px;flex-wrap:wrap;margin-bottom:16px}
+.ic{background:var(--surf);border:1px solid var(--e);border-radius:9px;padding:11px 15px;display:flex;flex-direction:column;gap:4px}
 .il{font-size:.68rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mist)}
-.iv{font-family:'DM Mono',monospace;font-size:.86rem;color:var(--snow)}
+.iv{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--snow)}
 .iv.g{color:var(--jade)}.iv.p{color:var(--v3)}.iv.a{color:var(--amber)}
 .zt{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;color:var(--mist);cursor:pointer;user-select:none;margin-left:auto}
 .zt input{accent-color:var(--v2);cursor:pointer}
 .zt:hover{color:var(--snow)}
-
-/* ─── CANVAS ─── */
-#canvas-area{display:none;gap:18px;margin-bottom:24px}
+#canvas-area{display:none;gap:16px;margin-bottom:22px}
 .panel{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--e);border-radius:var(--r);display:flex;flex-direction:column;overflow:hidden}
-.ph{padding:11px 16px;border-bottom:1px solid var(--e);background:var(--surf);display:flex;align-items:center;justify-content:space-between}
+.ph{padding:10px 15px;border-bottom:1px solid var(--e);background:var(--surf);display:flex;align-items:center;justify-content:space-between}
 .pt{font-size:.71rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mist);display:flex;align-items:center;gap:7px}
 .dot{width:7px;height:7px;border-radius:50%}
 .db{background:#3b82f6}.dp{background:var(--v2)}
-.cw{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;min-height:200px}
+.cw{flex:1;display:flex;align-items:center;justify-content:center;padding:13px;min-height:200px}
 .cw canvas{max-width:100%;max-height:560px;border-radius:7px;display:block}
-
 #actions{display:none;gap:10px;margin-bottom:36px;flex-wrap:wrap}
-
-/* ─── DEBUG PANEL ─── */
-#debug-bar{display:none;background:var(--surf);border:1px solid var(--e);border-radius:9px;padding:12px 16px;margin-bottom:18px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--mist);line-height:1.8}
-#debug-bar.show{display:block}
-#debug-bar strong{color:var(--v3)}
-
-@media(max-width:720px){#canvas-area{flex-direction:column}}
+@media(max-width:720px){#canvas-area{flex-direction:column}.adj-grid{grid-template-columns:1fr}}
 .fi{animation:fi .35s ease forwards}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
@@ -182,30 +115,24 @@ label.btn{cursor:pointer}
     <div class="gem">🛡️</div>
     <div class="brand-name">Slip<span>Shield</span></div>
   </div>
-  <span class="chip">AUTO BANK DETECT · NO OCR</span>
+  <span class="chip">AUTO DETECT · ADJUSTABLE · NO OCR</span>
 </header>
 
 <section class="hero">
   <h1>เบลอชื่อ<em>ผู้โอน</em> อัตโนมัติ</h1>
-  <p>ตรวจจับธนาคารจาก dominant color — รองรับ KBank, SCB, TrueMoney, Krungthai, Krungsri, KKP Better<br>ปรับ layout เองตามธนาคาร · สามารถเลือกธนาคารเองได้หากระบบตรวจจับผิด</p>
+  <p>ตรวจจับธนาคารจาก color — รองรับ KBank, SCB, TrueMoney, Krungthai, Krungsri, KKP<br>ปรับตำแหน่ง Blur และ QR ได้ real-time · เลือกธนาคารเองได้ถ้า detect ผิด</p>
   <div class="tag-row">
-    <span class="tag hi">🟩 KBank Auto</span>
-    <span class="tag hi">🟣 SCB Auto</span>
-    <span class="tag hi">🔴 TrueMoney Auto</span>
-    <span class="tag hi">🔵 Krungthai Auto</span>
-    <span class="tag hi">🟡 Krungsri Auto</span>
-    <span class="tag hi">🟪 KKP Auto</span>
-    <span class="tag">Color Detection</span>
-    <span class="tag">เบลอ: ผู้โอน</span>
-    <span class="tag">No OCR</span>
+    <span class="tag hi">🟩 KBank</span><span class="tag hi">🟣 SCB</span><span class="tag hi">🔴 TrueMoney</span>
+    <span class="tag hi">🔵 Krungthai</span><span class="tag hi">🟡 Krungsri</span><span class="tag hi">🟪 KKP</span>
+    <span class="tag">ปรับ Blur + QR ได้</span><span class="tag">No OCR</span>
   </div>
 </section>
 
 <!-- BANK SELECTOR -->
 <div class="bank-select-bar">
-  <span class="bsb-label">เลือกธนาคาร</span>
+  <span class="bsb-label">ธนาคาร</span>
   <div class="bank-btns">
-    <button class="bb active" data-bank="auto">🤖 Auto Detect</button>
+    <button class="bb active" data-bank="auto">🤖 Auto</button>
     <button class="bb" data-bank="kbank">🟩 KBank</button>
     <button class="bb" data-bank="scb">🟣 SCB</button>
     <button class="bb" data-bank="truemoney">🔴 TrueMoney</button>
@@ -213,46 +140,68 @@ label.btn{cursor:pointer}
     <button class="bb" data-bank="krungsri">🟡 Krungsri</button>
     <button class="bb" data-bank="kkp">🟪 KKP</button>
   </div>
-  <div class="detect-badge" id="detect-badge">✅ Auto detected: <strong id="detect-name">—</strong></div>
+  <div class="detect-badge" id="detect-badge">✅ Auto: <strong id="detect-name">—</strong></div>
+</div>
+
+<!-- ADJUSTMENT PANEL -->
+<div class="adj-panel" id="adj-panel">
+  <div class="adj-title">🎛️ ปรับตำแหน่ง Blur &amp; QR Overlay (real-time)</div>
+  <div class="adj-grid">
+    <div class="adj-section">
+      <div class="adj-sec-title adj-amber">🟧 Blur ผู้โอน (Sender)</div>
+      <div class="adj-rows">
+        <div class="adj-row"><span class="adj-lbl">X</span><input type="range" class="adj-slider amber" id="s-x" min="-30" max="30" step="1" value="0"><span class="adj-val" id="s-x-v">0%</span></div>
+        <div class="adj-row"><span class="adj-lbl">Y</span><input type="range" class="adj-slider amber" id="s-y" min="-30" max="30" step="1" value="0"><span class="adj-val" id="s-y-v">0%</span></div>
+        <div class="adj-row"><span class="adj-lbl">W</span><input type="range" class="adj-slider amber" id="s-w" min="-30" max="30" step="1" value="0"><span class="adj-val" id="s-w-v">0%</span></div>
+        <div class="adj-row"><span class="adj-lbl">H</span><input type="range" class="adj-slider amber" id="s-h" min="-20" max="20" step="1" value="0"><span class="adj-val" id="s-h-v">0%</span></div>
+      </div>
+      <div class="adj-footer"><button class="adj-reset" id="reset-sender">↺ Reset</button></div>
+    </div>
+    <div class="adj-section">
+      <div class="adj-sec-title adj-blue">🟦 QR Overlay</div>
+      <div class="adj-rows">
+        <div class="adj-row"><span class="adj-lbl">X</span><input type="range" class="adj-slider blue" id="q-x" min="-30" max="30" step="1" value="0"><span class="adj-val" id="q-x-v">0%</span></div>
+        <div class="adj-row"><span class="adj-lbl">Y</span><input type="range" class="adj-slider blue" id="q-y" min="-30" max="30" step="1" value="0"><span class="adj-val" id="q-y-v">0%</span></div>
+        <div class="adj-row"><span class="adj-lbl">W</span><input type="range" class="adj-slider blue" id="q-w" min="-20" max="20" step="1" value="0"><span class="adj-val" id="q-w-v">0%</span></div>
+        <div class="adj-row"><span class="adj-lbl">H</span><input type="range" class="adj-slider blue" id="q-h" min="-20" max="20" step="1" value="0"><span class="adj-val" id="q-h-v">0%</span></div>
+      </div>
+      <div class="adj-footer"><button class="adj-reset" id="reset-qr">↺ Reset</button></div>
+    </div>
+  </div>
 </div>
 
 <!-- OVERLAY CONFIG -->
 <div class="cfg-bar">
-  <span class="cfg-lbl">QR OVERLAY IMAGE</span>
+  <span class="cfg-lbl">QR OVERLAY</span>
   <img id="ov-thumb" class="ov-thumb" src="" alt="">
   <input id="ov-url" class="cfg-in" type="text" placeholder="Paste image URL…">
-  <label class="btn bo">📁 Local File <input type="file" id="ov-file" accept="image/*" style="display:none"></label>
+  <label class="btn bo">📁 File <input type="file" id="ov-file" accept="image/*" style="display:none"></label>
   <button class="btn bv" id="ov-apply">Apply</button>
 </div>
 
 <!-- DROP ZONE -->
 <div id="drop">
   <div class="di">🧾</div>
-  <div class="dh">วาง KBank, SCB, TrueMoney, Krungthai, Krungsri หรือ KKP slip ที่นี่</div>
-  <div class="ds">ระบบจะตรวจจับธนาคารและปรับ layout อัตโนมัติ — หรือเลือกธนาคารเองด้านบน</div>
+  <div class="dh">วาง slip ที่นี่</div>
+  <div class="ds">ระบบตรวจจับธนาคารอัตโนมัติ — ปรับตำแหน่ง Blur และ QR ได้หลังอัปโหลด</div>
   <div class="fmts"><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span></div>
   <button class="btn-br" id="browse-btn">📂 เลือกไฟล์</button>
   <input type="file" id="file-in" accept="image/jpeg,image/png,image/webp">
 </div>
 
-<!-- STATUS -->
 <div id="status"><span id="s-txt"></span></div>
-
-<!-- DEBUG -->
 <div id="debug-bar"></div>
 
-<!-- INFO CARDS -->
 <div id="info-box">
-  <div class="ic"><span class="il">Image Size</span><span class="iv" id="inf-sz">—</span></div>
-  <div class="ic"><span class="il">Bank Used</span><span class="iv p" id="inf-bank">—</span></div>
-  <div class="ic"><span class="il">Detection Confidence</span><span class="iv a" id="inf-conf">—</span></div>
-  <div class="ic"><span class="il">Sender Zone (BLURRED)</span><span class="iv a" id="inf-snd">—</span></div>
-  <div class="ic"><span class="il">QR Zone (OVERLAY)</span><span class="iv p" id="inf-qr">—</span></div>
-  <div class="ic"><span class="il">Receiver Zone</span><span class="iv g">NOT TOUCHED ✓</span></div>
-  <label class="zt"><input type="checkbox" id="show-zones"> Show zones</label>
+  <div class="ic"><span class="il">Size</span><span class="iv" id="inf-sz">—</span></div>
+  <div class="ic"><span class="il">Bank</span><span class="iv p" id="inf-bank">—</span></div>
+  <div class="ic"><span class="il">Confidence</span><span class="iv a" id="inf-conf">—</span></div>
+  <div class="ic"><span class="il">Sender (Blur)</span><span class="iv a" id="inf-snd">—</span></div>
+  <div class="ic"><span class="il">QR (Overlay)</span><span class="iv p" id="inf-qr">—</span></div>
+  <div class="ic"><span class="il">Receiver</span><span class="iv g">NOT TOUCHED ✓</span></div>
+  <label class="zt"><input type="checkbox" id="show-zones"> Zones</label>
 </div>
 
-<!-- CANVAS -->
 <div id="canvas-area">
   <div class="panel">
     <div class="ph"><span class="pt"><span class="dot db"></span>ต้นฉบับ (Original)</span></div>
@@ -261,13 +210,12 @@ label.btn{cursor:pointer}
   <div class="panel">
     <div class="ph">
       <span class="pt"><span class="dot dp"></span>ประมวลผลแล้ว (Processed)</span>
-      <span style="font-size:.67rem;color:var(--fog);font-family:'DM Mono',monospace">ผู้โอนถูกเบลอ • QR ถูกแทนที่ • ผู้รับไม่ถูกแตะ</span>
+      <span style="font-size:.67rem;color:var(--fog);font-family:'DM Mono',monospace">Blur • QR Replaced • Receiver Safe</span>
     </div>
     <div class="cw"><canvas id="out-c"></canvas></div>
   </div>
 </div>
 
-<!-- ACTIONS -->
 <div id="actions">
   <button class="btn bg" id="dl-btn" disabled>⬇ ดาวน์โหลด PNG</button>
   <button class="btn bo" id="reset-btn">✕ เริ่มใหม่</button>
@@ -275,530 +223,271 @@ label.btn{cursor:pointer}
 
 </div>
 <script>
-/* ══════════════════════════════════════════════════════
-   BANK LAYOUTS
-   ─ All coords are fractions of the FULL image (W/H).
-   ─ Measured from real slip screenshots.
-   ─ sender = name/account line to blur
-   ─ qr     = QR code square to replace
-══════════════════════════════════════════════════════ */
-const LAYOUTS = {
-  kbank: {
-    label: 'KBank / K PLUS',
-    icon: '🟩',
-    // Sender name sits roughly at 20–75% width, ~18–28% height (just below header stripe)
-    sender: { xP:.18, yP:.185, wP:.58, hP:.095 },
-    // QR usually at bottom-right quadrant
-    qr:     { xP:.68, yP:.635, wP:.26, hP:.26 },
-  },
-  scb: {
-    label: 'SCB / SCB EASY',
-    icon: '🟣',
-    // SCB slip: purple gradient header, sender name at ~22–80% width, ~33–44% height
-    sender: { xP:.20, yP:.335, wP:.58, hP:.095 },
-    // QR at bottom center-right
-    qr:     { xP:.62, yP:.65, wP:.30, hP:.30 },
-  },
-  truemoney: {
-    label: 'TrueMoney Wallet',
-    icon: '🔴',
-    // TrueMoney: sender below large amount, ~5–75% width, ~30–38% height
-    sender: { xP:.05, yP:.295, wP:.65, hP:.085 },
-    // QR at right side ~68–90% wide, ~55–80% height
-    qr:     { xP:.68, yP:.555, wP:.26, hP:.26 },
-  },
-  krungthai: {
-    label: 'Krungthai / KTB',
-    icon: '🔵',
-    // Krungthai: blue header, sender ~5–70% width, ~34–44% height
-    sender: { xP:.05, yP:.335, wP:.62, hP:.095 },
-    // QR top-right area in KTB app
-    qr:     { xP:.68, yP:.135, wP:.26, hP:.26 },
-  },
-  krungsri: {
-    label: 'Krungsri / BAY',
-    icon: '🟡',
-    // Krungsri: yellow header, sender ~30–90% width, ~16–24% height
-    sender: { xP:.28, yP:.155, wP:.62, hP:.08 },
-    // QR at right middle
-    qr:     { xP:.65, yP:.385, wP:.28, hP:.28 },
-  },
-  kkp: {
-    label: 'KKP Better',
-    icon: '🟪',
-    // KKP: dark purple/indigo, sender ~15–85% width, ~42–52% height
-    sender: { xP:.13, yP:.415, wP:.70, hP:.095 },
-    // QR at bottom-right
-    qr:     { xP:.72, yP:.745, wP:.22, hP:.22 },
-  },
+const LAYOUTS={
+  kbank:{label:'KBank / K PLUS',icon:'🟩',sender:{xP:.18,yP:.185,wP:.58,hP:.095},qr:{xP:.68,yP:.635,wP:.26,hP:.26}},
+  scb:{label:'SCB / SCB EASY',icon:'🟣',sender:{xP:.20,yP:.335,wP:.58,hP:.095},qr:{xP:.62,yP:.65,wP:.30,hP:.30}},
+  truemoney:{label:'TrueMoney Wallet',icon:'🔴',sender:{xP:.05,yP:.295,wP:.65,hP:.085},qr:{xP:.68,yP:.555,wP:.26,hP:.26}},
+  krungthai:{label:'Krungthai / KTB',icon:'🔵',sender:{xP:.05,yP:.335,wP:.62,hP:.095},qr:{xP:.68,yP:.135,wP:.26,hP:.26}},
+  krungsri:{label:'Krungsri / BAY',icon:'🟡',sender:{xP:.28,yP:.155,wP:.62,hP:.08},qr:{xP:.65,yP:.385,wP:.28,hP:.28}},
+  kkp:{label:'KKP Better',icon:'🟪',sender:{xP:.13,yP:.415,wP:.70,hP:.095},qr:{xP:.72,yP:.745,wP:.22,hP:.22}},
 };
 
-/* ══════════════════════════════════════════════════════
-   STATE
-══════════════════════════════════════════════════════ */
-let overlayImg    = null;
-let currentImg    = null;
-let showZones     = false;
-let autoDetected  = null;   // bank key from color analysis
-let manualBank    = 'auto'; // 'auto' or specific bank key
+const adj={sx:0,sy:0,sw:0,sh:0,qx:0,qy:0,qw:0,qh:0};
+let overlayImg=null,currentImg=null,showZones=false,autoDetected=null,manualBank='auto';
 
-/* ══════════════════════════════════════════════════════
-   ELEMENTS
-══════════════════════════════════════════════════════ */
-const drop       = document.getElementById('drop');
-const fileIn     = document.getElementById('file-in');
-const browseBtn  = document.getElementById('browse-btn');
-const statusEl   = document.getElementById('status');
-const sTxt       = document.getElementById('s-txt');
-const caArea     = document.getElementById('canvas-area');
-const origC      = document.getElementById('orig-c');
-const outC       = document.getElementById('out-c');
-const origX      = origC.getContext('2d');
-const outX       = outC.getContext('2d');
-const infoBox    = document.getElementById('info-box');
-const actions    = document.getElementById('actions');
-const dlBtn      = document.getElementById('dl-btn');
-const resetBtn   = document.getElementById('reset-btn');
-const ovThumb    = document.getElementById('ov-thumb');
-const ovUrl      = document.getElementById('ov-url');
-const ovFile     = document.getElementById('ov-file');
-const ovApply    = document.getElementById('ov-apply');
-const zonesChk   = document.getElementById('show-zones');
-const infSz      = document.getElementById('inf-sz');
-const infBank    = document.getElementById('inf-bank');
-const infConf    = document.getElementById('inf-conf');
-const infSnd     = document.getElementById('inf-snd');
-const infQR      = document.getElementById('inf-qr');
-const debugBar   = document.getElementById('debug-bar');
-const detectBadge= document.getElementById('detect-badge');
-const detectName = document.getElementById('detect-name');
+const sliderDefs=[
+  {id:'s-x',key:'sx',val:'s-x-v'},{id:'s-y',key:'sy',val:'s-y-v'},
+  {id:'s-w',key:'sw',val:'s-w-v'},{id:'s-h',key:'sh',val:'s-h-v'},
+  {id:'q-x',key:'qx',val:'q-x-v'},{id:'q-y',key:'qy',val:'q-y-v'},
+  {id:'q-w',key:'qw',val:'q-w-v'},{id:'q-h',key:'qh',val:'q-h-v'},
+];
 
-/* ══════════════════════════════════════════════════════
-   BANK SELECTOR BUTTONS
-══════════════════════════════════════════════════════ */
-document.querySelectorAll('.bb').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.bb').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    manualBank = btn.dataset.bank;
-    if (currentImg) render();
+sliderDefs.forEach(({id,key,val})=>{
+  const sl=document.getElementById(id),vEl=document.getElementById(val);
+  sl.addEventListener('input',()=>{adj[key]=parseInt(sl.value)/100;vEl.textContent=sl.value+'%';if(currentImg)render();});
+});
+
+document.getElementById('reset-sender').addEventListener('click',()=>{
+  ['s-x','s-y','s-w','s-h'].forEach(id=>{const sl=document.getElementById(id);sl.value=0;sl.dispatchEvent(new Event('input'));});
+});
+document.getElementById('reset-qr').addEventListener('click',()=>{
+  ['q-x','q-y','q-w','q-h'].forEach(id=>{const sl=document.getElementById(id);sl.value=0;sl.dispatchEvent(new Event('input'));});
+});
+
+document.querySelectorAll('.bb').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.bb').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');manualBank=btn.dataset.bank;if(currentImg)render();
   });
 });
 
-/* ══════════════════════════════════════════════════════
-   EFFECTIVE BANK (manual override wins over auto)
-══════════════════════════════════════════════════════ */
-function effectiveBank() {
-  if (manualBank !== 'auto') return manualBank;
-  return autoDetected || 'kbank';
+function effectiveBank(){return manualBank!=='auto'?manualBank:(autoDetected||'kbank');}
+
+function makeFallbackOverlay(){
+  const fc=document.createElement('canvas');fc.width=fc.height=200;
+  const fx=fc.getContext('2d');
+  fx.fillStyle='#6b38ff';fx.beginPath();fx.arc(100,100,100,0,Math.PI*2);fx.fill();
+  fx.fillStyle='#fff';fx.font='bold 72px sans-serif';fx.textAlign='center';fx.textBaseline='middle';fx.fillText('IX',100,105);
+  const fi=new Image();fi.src=fc.toDataURL();
+  fi.onload=()=>{overlayImg=fi;document.getElementById('ov-thumb').src=fi.src;if(currentImg)render();};
 }
 
-/* ══════════════════════════════════════════════════════
-   OVERLAY LOADER
-══════════════════════════════════════════════════════ */
-function makeFallbackOverlay() {
-  const fc = document.createElement('canvas');
-  fc.width = fc.height = 200;
-  const fx = fc.getContext('2d');
-  fx.fillStyle = '#6b38ff';
-  fx.beginPath(); fx.arc(100,100,100,0,Math.PI*2); fx.fill();
-  fx.fillStyle = '#fff'; fx.font = 'bold 72px sans-serif';
-  fx.textAlign = 'center'; fx.textBaseline = 'middle'; fx.fillText('QR',100,105);
-  const fi = new Image();
-  fi.src = fc.toDataURL();
-  fi.onload = () => { overlayImg = fi; ovThumb.src = fi.src; if (currentImg) render(); };
+function loadOverlay(src){
+  const img=new Image();img.crossOrigin='anonymous';
+  img.onload=()=>{overlayImg=img;document.getElementById('ov-thumb').src=img.src;if(currentImg)render();};
+  img.onerror=()=>makeFallbackOverlay();
+  img.src=src;
 }
 
-function loadOverlay(src) {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => { overlayImg = img; ovThumb.src = img.src; if (currentImg) render(); };
-  img.onerror = () => makeFallbackOverlay();
-  img.src = src;
-}
-
-(async () => {
-  try {
-    const r = await fetch('/mnt/user-data/uploads/412.png');
-    if (!r.ok) throw 0;
-    const blob = await r.blob();
-    const rd = new FileReader();
-    rd.onload = e => { loadOverlay(e.target.result); ovUrl.value = '(INSIDEX logo)'; };
+(async()=>{
+  try{
+    const r=await fetch('/mnt/user-data/uploads/412.png');if(!r.ok)throw 0;
+    const blob=await r.blob();const rd=new FileReader();
+    rd.onload=e=>{loadOverlay(e.target.result);document.getElementById('ov-url').value='(INSIDEX logo)';};
     rd.readAsDataURL(blob);
-  } catch { makeFallbackOverlay(); }
+  }catch{makeFallbackOverlay();}
 })();
 
-ovApply.addEventListener('click', () => {
-  const v = ovUrl.value.trim();
-  if (v && !v.startsWith('(')) loadOverlay(v);
-});
-ovUrl.addEventListener('keydown', e => { if (e.key === 'Enter') ovApply.click(); });
-ovFile.addEventListener('change', () => {
-  const f = ovFile.files[0]; if (!f) return;
-  const rd = new FileReader();
-  rd.onload = e => { loadOverlay(e.target.result); ovUrl.value = f.name; };
-  rd.readAsDataURL(f);
+document.getElementById('ov-apply').addEventListener('click',()=>{const v=document.getElementById('ov-url').value.trim();if(v&&!v.startsWith('('))loadOverlay(v);});
+document.getElementById('ov-url').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('ov-apply').click();});
+document.getElementById('ov-file').addEventListener('change',()=>{
+  const f=document.getElementById('ov-file').files[0];if(!f)return;
+  const rd=new FileReader();rd.onload=e=>{loadOverlay(e.target.result);document.getElementById('ov-url').value=f.name;};rd.readAsDataURL(f);
 });
 
-/* ══════════════════════════════════════════════════════
-   DRAG & DROP / FILE PICKER
-══════════════════════════════════════════════════════ */
-drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-drop.addEventListener('drop', e => {
-  e.preventDefault(); drop.classList.remove('over');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) loadSlip(f);
-});
-drop.addEventListener('click', () => fileIn.click());
-browseBtn.addEventListener('click', e => { e.stopPropagation(); fileIn.click(); });
-fileIn.addEventListener('change', () => { if (fileIn.files[0]) loadSlip(fileIn.files[0]); });
+const drop=document.getElementById('drop'),fileIn=document.getElementById('file-in');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadSlip(f);});
+drop.addEventListener('click',()=>fileIn.click());
+document.getElementById('browse-btn').addEventListener('click',e=>{e.stopPropagation();fileIn.click();});
+fileIn.addEventListener('change',()=>{if(fileIn.files[0])loadSlip(fileIn.files[0]);});
 
-/* ══════════════════════════════════════════════════════
-   LOAD SLIP
-══════════════════════════════════════════════════════ */
-function loadSlip(file) {
-  const rd = new FileReader();
-  rd.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      currentImg = img;
-      const W = img.naturalWidth, H = img.naturalHeight;
-      origC.width = outC.width = W;
-      origC.height = outC.height = H;
-      origX.drawImage(img, 0, 0);
-      autoDetected = detectBank(origX, W, H);
-      render();
-      showUI();
+function loadSlip(file){
+  const rd=new FileReader();
+  rd.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      currentImg=img;
+      const W=img.naturalWidth,H=img.naturalHeight;
+      const origC=document.getElementById('orig-c'),outC=document.getElementById('out-c');
+      origC.width=outC.width=W;origC.height=outC.height=H;
+      origC.getContext('2d').drawImage(img,0,0);
+      autoDetected=detectBank(origC.getContext('2d'),W,H);
+      render();showUI();
     };
-    img.src = e.target.result;
+    img.src=e.target.result;
   };
   rd.readAsDataURL(file);
 }
 
-/* ══════════════════════════════════════════════════════
-   BANK DETECTION — improved multi-region color scoring
-   Strategy:
-   1. Sample 3 regions: header top-10%, left strip 10–40% height, full top-25%
-   2. Per pixel: classify into bank color buckets using HSV-like rules
-   3. Normalise by sample count → confidence %
-   4. Pick winner only if confidence gap is meaningful (avoid false positives)
-══════════════════════════════════════════════════════ */
-function rgbToHsl(r, g, b) {
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r,g,b), min = Math.min(r,g,b);
-  const l = (max+min)/2;
-  if (max === min) return [0, 0, l];
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  let h;
-  switch(max){
-    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-    case g: h = (b - r) / d + 2; break;
-    default: h = (r - g) / d + 4;
-  }
-  return [h * 60, s, l];
+function rgbToHsl(r,g,b){
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),l=(max+min)/2;
+  if(max===min)return[0,0,l];
+  const d=max-min,s=l>0.5?d/(2-max-min):d/(max+min);
+  let h;switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4;}
+  return[h*60,s,l];
 }
 
-function detectBank(ctx, W, H) {
-  const scores = { kbank:0, scb:0, truemoney:0, krungthai:0, krungsri:0, kkp:0 };
-  const regions = [
-    // Top 12% — logo/header bar
-    ctx.getImageData(0, 0, W, Math.max(1, Math.floor(H * 0.12))),
-    // Left 15% strip, full height — side accent
-    ctx.getImageData(0, 0, Math.max(1, Math.floor(W * 0.15)), H),
+function detectBank(ctx,W,H){
+  const scores={kbank:0,scb:0,truemoney:0,krungthai:0,krungsri:0,kkp:0};
+  const regions=[
+    ctx.getImageData(0,0,W,Math.max(1,Math.floor(H*0.12))),
+    ctx.getImageData(0,0,Math.max(1,Math.floor(W*0.15)),H),
   ];
-
-  for (const id of regions) {
-    const d = id.data;
-    const step = 4; // every 4th pixel
-    for (let i = 0; i < d.length; i += 4 * step) {
-      const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
-      if (a < 200) continue; // skip transparent
-      // Skip near-white and near-black pixels — background, not brand color
-      const lum = (r + g + b) / 3;
-      if (lum > 225 || lum < 20) continue;
-
-      const [h, s, l] = rgbToHsl(r, g, b);
-      if (s < 0.20) continue; // skip near-grey
-
-      // ── KBank green: hue 100–160, high saturation, medium lightness ──
-      if (h >= 100 && h <= 160 && s >= 0.35 && l >= 0.15 && l <= 0.70) {
-        scores.kbank += 2;
-      }
-      // ── SCB purple: hue 260–310, distinct sat ──
-      else if (h >= 255 && h <= 315 && s >= 0.30 && l >= 0.20 && l <= 0.60) {
-        scores.scb += 2;
-      }
-      // ── TrueMoney red/orange-red: hue 0–20 or 340–360, high sat ──
-      else if ((h <= 20 || h >= 340) && s >= 0.45 && l >= 0.20 && l <= 0.65) {
-        scores.truemoney += 2;
-      }
-      // ── Krungthai blue: hue 200–240, moderate-high sat ──
-      else if (h >= 195 && h <= 245 && s >= 0.35 && l >= 0.20 && l <= 0.65) {
-        scores.krungthai += 2;
-      }
-      // ── Krungsri yellow/amber: hue 35–65, high sat ──
-      else if (h >= 30 && h <= 68 && s >= 0.50 && l >= 0.30 && l <= 0.75) {
-        scores.krungsri += 2;
-      }
-      // ── KKP deep indigo/violet: hue 240–265, high sat, darker ──
-      else if (h >= 230 && h <= 262 && s >= 0.40 && l >= 0.12 && l <= 0.50) {
-        scores.kkp += 2;
-      }
+  for(const id of regions){
+    const d=id.data;
+    for(let i=0;i<d.length;i+=16){
+      const r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];
+      if(a<200)continue;
+      const lum=(r+g+b)/3;if(lum>225||lum<20)continue;
+      const[h,s,l]=rgbToHsl(r,g,b);if(s<0.20)continue;
+      if(h>=100&&h<=160&&s>=0.35&&l>=0.15&&l<=0.70)      scores.kbank+=2;
+      else if(h>=255&&h<=315&&s>=0.30&&l>=0.20&&l<=0.60)  scores.scb+=2;
+      else if((h<=20||h>=340)&&s>=0.45&&l>=0.20&&l<=0.65) scores.truemoney+=2;
+      else if(h>=195&&h<=245&&s>=0.35&&l>=0.20&&l<=0.65)  scores.krungthai+=2;
+      else if(h>=30&&h<=68&&s>=0.50&&l>=0.30&&l<=0.75)    scores.krungsri+=2;
+      else if(h>=230&&h<=262&&s>=0.40&&l>=0.12&&l<=0.50)  scores.kkp+=2;
     }
   }
-
-  // Build debug info
-  const total = Object.values(scores).reduce((a,b) => a+b, 0) || 1;
-  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-  const winner = sorted[0][0];
-  const winnerScore = sorted[0][1];
-  const runnerUp = sorted[1][1];
-  const confidence = Math.round((winnerScore / total) * 100);
-  const gap = winnerScore - runnerUp;
-
-  // Store for display
-  window._detectScores = scores;
-  window._detectConf = confidence;
-  window._detectGap = gap;
-  window._detectTotal = total;
-
-  // Show debug bar
-  const scoreStr = sorted.map(([k,v]) => `<strong>${k}</strong>:${v}`).join(' · ');
-  debugBar.innerHTML = `🔍 Detection scores → ${scoreStr} | confidence: <strong>${confidence}%</strong> | gap: <strong>${gap}</strong>`;
-  debugBar.classList.add('show');
-
-  // Require minimum evidence + meaningful gap to be confident
-  if (winnerScore < 10 || gap < 4) {
-    // Too close to call — default to kbank
-    return 'kbank';
-  }
+  const total=Object.values(scores).reduce((a,b)=>a+b,0)||1;
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const winner=sorted[0][0],winnerScore=sorted[0][1],runnerUp=sorted[1][1];
+  const confidence=Math.round((winnerScore/total)*100),gap=winnerScore-runnerUp;
+  window._detectConf=confidence;
+  const dbEl=document.getElementById('debug-bar');
+  dbEl.innerHTML='🔍 '+sorted.map(([k,v])=>`<strong>${k}</strong>:${v}`).join(' · ')+` | conf: <strong>${confidence}%</strong> | gap: <strong>${gap}</strong>`;
+  dbEl.classList.add('show');
+  if(winnerScore<10||gap<4)return'kbank';
   return winner;
 }
 
-/* ══════════════════════════════════════════════════════
-   CLAMP
-══════════════════════════════════════════════════════ */
-function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
 
-/* ══════════════════════════════════════════════════════
-   LAYOUT COMPUTATION — purely proportional, no card nesting
-══════════════════════════════════════════════════════ */
-function computeLayout(W, H, bank) {
-  const L = LAYOUTS[bank];
-  const sender = {
-    x: Math.round(clamp(L.sender.xP * W, 0, W-2)),
-    y: Math.round(clamp(L.sender.yP * H, 0, H-2)),
-    w: Math.round(clamp(L.sender.wP * W, 4, W)),
-    h: Math.round(clamp(L.sender.hP * H, 4, H)),
+function computeLayout(W,H,bank){
+  const L=LAYOUTS[bank];
+  const sender={
+    x:Math.round(clamp((L.sender.xP+adj.sx)*W,0,W-2)),
+    y:Math.round(clamp((L.sender.yP+adj.sy)*H,0,H-2)),
+    w:Math.round(clamp((L.sender.wP+adj.sw)*W,4,W)),
+    h:Math.round(clamp((L.sender.hP+adj.sh)*H,4,H)),
   };
-  sender.w = clamp(sender.w, 4, W - sender.x);
-  sender.h = clamp(sender.h, 4, H - sender.y);
-
-  const qr = {
-    x: Math.round(clamp(L.qr.xP * W, 0, W-2)),
-    y: Math.round(clamp(L.qr.yP * H, 0, H-2)),
-    w: Math.round(clamp(L.qr.wP * W, 4, W)),
-    h: Math.round(clamp(L.qr.hP * H, 4, H)),
+  sender.w=clamp(sender.w,4,W-sender.x);sender.h=clamp(sender.h,4,H-sender.y);
+  const qr={
+    x:Math.round(clamp((L.qr.xP+adj.qx)*W,0,W-2)),
+    y:Math.round(clamp((L.qr.yP+adj.qy)*H,0,H-2)),
+    w:Math.round(clamp((L.qr.wP+adj.qw)*W,4,W)),
+    h:Math.round(clamp((L.qr.hP+adj.qh)*H,4,H)),
   };
-  qr.w = clamp(qr.w, 4, W - qr.x);
-  qr.h = clamp(qr.h, 4, H - qr.y);
-  return { sender, qr };
+  qr.w=clamp(qr.w,4,W-qr.x);qr.h=clamp(qr.h,4,H-qr.y);
+  return{sender,qr};
 }
 
-/* ══════════════════════════════════════════════════════
-   RENDER
-══════════════════════════════════════════════════════ */
-function render() {
-  if (!currentImg) return;
-  const bank = effectiveBank();
-  const W = currentImg.naturalWidth, H = currentImg.naturalHeight;
-  outX.clearRect(0, 0, W, H);
-  outX.drawImage(currentImg, 0, 0);
-
-  const { sender, qr } = computeLayout(W, H, bank);
-  blurRect(outX, sender.x, sender.y, sender.w, sender.h, 28);
-  drawQROverlay(outX, qr);
-
-  if (showZones) {
-    outline(outX, sender, '#f59e0b', 'ผู้โอน (BLUR)');
-    outline(outX, qr, '#3b82f6', 'QR (OVERLAY)');
-  }
-
-  const L = LAYOUTS[bank];
-  const conf = window._detectConf;
-  infSz.textContent   = `${W} × ${H} px`;
-  infBank.textContent  = `${L.icon} ${L.label}${manualBank !== 'auto' ? ' (manual)' : ' (auto)'}`;
-  infConf.textContent  = conf != null ? `${conf}%` : '—';
-  infSnd.textContent   = `(${sender.x},${sender.y}) ${sender.w}×${sender.h}`;
-  infQR.textContent    = `(${qr.x},${qr.y}) ${qr.w}×${qr.h}`;
-
-  // Update detect badge
-  if (autoDetected) {
-    detectName.textContent = `${LAYOUTS[autoDetected].icon} ${LAYOUTS[autoDetected].label}`;
-    detectBadge.classList.add('show');
+function render(){
+  if(!currentImg)return;
+  const bank=effectiveBank(),W=currentImg.naturalWidth,H=currentImg.naturalHeight;
+  const outC=document.getElementById('out-c'),outX=outC.getContext('2d');
+  outX.clearRect(0,0,W,H);outX.drawImage(currentImg,0,0);
+  const{sender,qr}=computeLayout(W,H,bank);
+  blurRect(outX,sender.x,sender.y,sender.w,sender.h,28);
+  drawQROverlay(outX,qr);
+  if(showZones){outline(outX,sender,'#f59e0b','SENDER');outline(outX,qr,'#3b82f6','QR');}
+  const L=LAYOUTS[bank];
+  document.getElementById('inf-sz').textContent=`${W} × ${H} px`;
+  document.getElementById('inf-bank').textContent=`${L.icon} ${L.label}${manualBank!=='auto'?' (manual)':' (auto)'}`;
+  document.getElementById('inf-conf').textContent=window._detectConf!=null?`${window._detectConf}%`:'—';
+  document.getElementById('inf-snd').textContent=`(${sender.x},${sender.y}) ${sender.w}×${sender.h}`;
+  document.getElementById('inf-qr').textContent=`(${qr.x},${qr.y}) ${qr.w}×${qr.h}`;
+  if(autoDetected){
+    document.getElementById('detect-name').textContent=`${LAYOUTS[autoDetected].icon} ${LAYOUTS[autoDetected].label}`;
+    document.getElementById('detect-badge').classList.add('show');
   }
 }
 
-/* ══════════════════════════════════════════════════════
-   TRIPLE-PASS BOX BLUR (fast, pure JS, no CSS filter)
-══════════════════════════════════════════════════════ */
-function blurRect(ctx, x, y, w, h, rad) {
-  x = Math.max(0, Math.round(x)); y = Math.max(0, Math.round(y));
-  w = Math.min(ctx.canvas.width - x, Math.round(w));
-  h = Math.min(ctx.canvas.height - y, Math.round(h));
-  if (w <= 0 || h <= 0) return;
-  const id = ctx.getImageData(x, y, w, h);
-  boxBlurPass(id, rad);
-  boxBlurPass(id, rad);
-  boxBlurPass(id, Math.round(rad * 0.6));
-  ctx.putImageData(id, x, y);
+function blurRect(ctx,x,y,w,h,rad){
+  x=Math.max(0,Math.round(x));y=Math.max(0,Math.round(y));
+  w=Math.min(ctx.canvas.width-x,Math.round(w));h=Math.min(ctx.canvas.height-y,Math.round(h));
+  if(w<=0||h<=0)return;
+  const id=ctx.getImageData(x,y,w,h);
+  blurPass(id,rad);blurPass(id,rad);blurPass(id,Math.round(rad*0.6));
+  ctx.putImageData(id,x,y);
 }
-
-function boxBlurPass(id, rad) {
-  const { data: d, width: W, height: H } = id;
-  const r2 = rad * 2 + 1;
-  const buf = new Uint8ClampedArray(d.length);
-  // Horizontal pass
-  for (let row = 0; row < H; row++) {
+function blurPass(id,rad){
+  const{data:d,width:W,height:H}=id,r2=rad*2+1,buf=new Uint8ClampedArray(d.length);
+  for(let row=0;row<H;row++){
+    let rs=0,gs=0,bs=0,as=0;const rb=row*W*4;
+    for(let k=-rad;k<=rad;k++){const c=clamp(k,0,W-1)*4+rb;rs+=d[c];gs+=d[c+1];bs+=d[c+2];as+=d[c+3];}
+    for(let col=0;col<W;col++){
+      const i=rb+col*4;buf[i]=rs/r2;buf[i+1]=gs/r2;buf[i+2]=bs/r2;buf[i+3]=as/r2;
+      const ai=rb+clamp(col+rad+1,0,W-1)*4,ri=rb+clamp(col-rad,0,W-1)*4;
+      rs+=d[ai]-d[ri];gs+=d[ai+1]-d[ri+1];bs+=d[ai+2]-d[ri+2];as+=d[ai+3]-d[ri+3];
+    }
+  }
+  for(let col=0;col<W;col++){
     let rs=0,gs=0,bs=0,as=0;
-    const rb = row * W * 4;
-    for (let k = -rad; k <= rad; k++) {
-      const c = clamp(k, 0, W-1) * 4 + rb;
-      rs += d[c]; gs += d[c+1]; bs += d[c+2]; as += d[c+3];
-    }
-    for (let col = 0; col < W; col++) {
-      const i = rb + col * 4;
-      buf[i] = rs/r2; buf[i+1] = gs/r2; buf[i+2] = bs/r2; buf[i+3] = as/r2;
-      const ai = rb + clamp(col+rad+1, 0, W-1)*4;
-      const ri = rb + clamp(col-rad,   0, W-1)*4;
-      rs += d[ai]-d[ri]; gs += d[ai+1]-d[ri+1]; bs += d[ai+2]-d[ri+2]; as += d[ai+3]-d[ri+3];
-    }
-  }
-  // Vertical pass
-  for (let col = 0; col < W; col++) {
-    let rs=0,gs=0,bs=0,as=0;
-    for (let k = -rad; k <= rad; k++) {
-      const r = clamp(k, 0, H-1);
-      const i = (r * W + col) * 4;
-      rs += buf[i]; gs += buf[i+1]; bs += buf[i+2]; as += buf[i+3];
-    }
-    for (let row = 0; row < H; row++) {
-      const i = (row * W + col) * 4;
-      d[i] = rs/r2; d[i+1] = gs/r2; d[i+2] = bs/r2; d[i+3] = as/r2;
-      const ai = (clamp(row+rad+1, 0, H-1) * W + col) * 4;
-      const ri = (clamp(row-rad,   0, H-1) * W + col) * 4;
-      rs += buf[ai]-buf[ri]; gs += buf[ai+1]-buf[ri+1]; bs += buf[ai+2]-buf[ri+2]; as += buf[ai+3]-buf[ri+3];
+    for(let k=-rad;k<=rad;k++){const r=clamp(k,0,H-1);const i=(r*W+col)*4;rs+=buf[i];gs+=buf[i+1];bs+=buf[i+2];as+=buf[i+3];}
+    for(let row=0;row<H;row++){
+      const i=(row*W+col)*4;d[i]=rs/r2;d[i+1]=gs/r2;d[i+2]=bs/r2;d[i+3]=as/r2;
+      const ai=(clamp(row+rad+1,0,H-1)*W+col)*4,ri=(clamp(row-rad,0,H-1)*W+col)*4;
+      rs+=buf[ai]-buf[ri];gs+=buf[ai+1]-buf[ri+1];bs+=buf[ai+2]-buf[ri+2];as+=buf[ai+3]-buf[ri+3];
     }
   }
 }
 
-/* ══════════════════════════════════════════════════════
-   QR OVERLAY — circular white disc + logo centered
-   Fix: no vertical offset hack, pure centered placement
-══════════════════════════════════════════════════════ */
-function drawQROverlay(ctx, qr) {
-  const cx = qr.x + qr.w / 2;
-  const cy = qr.y + qr.h / 2;
-  const cr = Math.min(qr.w, qr.h) / 2;
-
-  ctx.save();
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-
-  // White circle background
-  ctx.beginPath();
-  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.97)';
-  ctx.fill();
-
-  // Clip to circle
-  ctx.beginPath();
-  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
-  ctx.clip();
-
-  if (overlayImg) {
-    const ar = overlayImg.naturalWidth / overlayImg.naturalHeight;
-    const dia = cr * 2 * 0.85;
-    let dw, dh;
-    if (ar >= 1) { dw = dia; dh = dia / ar; }
-    else         { dh = dia; dw = dia * ar; }
-    ctx.drawImage(overlayImg, cx - dw/2, cy - dh/2, dw, dh);
-  } else {
-    ctx.fillStyle = '#6b38ff';
-    ctx.font = `bold ${cr * 0.7}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('QR', cx, cy);
+function drawQROverlay(ctx,qr){
+  const cx=qr.x+qr.w/2,cy=qr.y+qr.h/2,cr=Math.min(qr.w,qr.h)/2;
+  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.beginPath();ctx.arc(cx,cy,cr,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.97)';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,cr,0,Math.PI*2);ctx.clip();
+  if(overlayImg){
+    const ar=overlayImg.naturalWidth/overlayImg.naturalHeight,dia=cr*2*0.85;
+    let dw,dh;if(ar>=1){dw=dia;dh=dia/ar;}else{dh=dia;dw=dia*ar;}
+    ctx.drawImage(overlayImg,cx-dw/2,cy-dh/2,dw,dh);
+  }else{
+    ctx.fillStyle='#6b38ff';ctx.font=`bold ${cr*0.7}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('IX',cx,cy);
   }
   ctx.restore();
 }
 
-/* ══════════════════════════════════════════════════════
-   ZONE OUTLINE — helper for debug
-══════════════════════════════════════════════════════ */
-function outline(ctx, r, color, label) {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(2, r.h * 0.04);
-  ctx.setLineDash([8, 4]);
-  ctx.strokeRect(r.x, r.y, r.w, r.h);
-  ctx.setLineDash([]);
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.9;
-  const fs = Math.max(12, Math.round(r.h * 0.25));
-  ctx.font = `bold ${fs}px sans-serif`;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'bottom';
-  ctx.fillText(label, r.x + 4, r.y - 3);
-  ctx.restore();
+function outline(ctx,r,color,label){
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=Math.max(2,r.h*0.04);
+  ctx.setLineDash([8,4]);ctx.strokeRect(r.x,r.y,r.w,r.h);ctx.setLineDash([]);
+  ctx.fillStyle=color;ctx.globalAlpha=0.9;ctx.font=`bold ${Math.max(12,Math.round(r.h*0.25))}px sans-serif`;
+  ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(label,r.x+4,r.y-3);ctx.restore();
 }
 
-/* ══════════════════════════════════════════════════════
-   SHOW UI
-══════════════════════════════════════════════════════ */
-function showUI() {
-  drop.style.display = 'none';
-  caArea.style.display = 'flex'; caArea.classList.add('fi');
-  infoBox.style.display = 'flex'; infoBox.classList.add('fi');
-  actions.style.display = 'flex';
-  dlBtn.disabled = false;
-  statusEl.style.display = 'flex';
-  statusEl.className = 'ok';
-  const bank = effectiveBank();
-  sTxt.textContent = `✅ เสร็จสิ้น — ${LAYOUTS[bank].label}: ชื่อผู้โอนถูกเบลอ, QR ถูกแทนที่ · เลือกธนาคารเองด้านบนถ้าผิด`;
+function showUI(){
+  drop.style.display='none';
+  const caArea=document.getElementById('canvas-area'),infoBox=document.getElementById('info-box'),actions=document.getElementById('actions');
+  caArea.style.display='flex';caArea.classList.add('fi');
+  infoBox.style.display='flex';infoBox.classList.add('fi');
+  actions.style.display='flex';
+  document.getElementById('adj-panel').classList.add('show');
+  document.getElementById('dl-btn').disabled=false;
+  const statusEl=document.getElementById('status');statusEl.style.display='flex';statusEl.className='ok';
+  document.getElementById('s-txt').textContent=`✅ เสร็จสิ้น — ${LAYOUTS[effectiveBank()].label} · ปรับ slider ได้ถ้าตำแหน่งไม่ตรง`;
 }
 
-/* ══════════════════════════════════════════════════════
-   ZONE TOGGLE
-══════════════════════════════════════════════════════ */
-zonesChk.addEventListener('change', () => { showZones = zonesChk.checked; if (currentImg) render(); });
+document.getElementById('show-zones').addEventListener('change',e=>{showZones=e.target.checked;if(currentImg)render();});
 
-/* ══════════════════════════════════════════════════════
-   DOWNLOAD / RESET
-══════════════════════════════════════════════════════ */
-dlBtn.addEventListener('click', () => {
-  const a = document.createElement('a');
-  a.download = `${effectiveBank()}_slip_processed.png`;
-  a.href = outC.toDataURL('image/png');
-  a.click();
+document.getElementById('dl-btn').addEventListener('click',()=>{
+  const a=document.createElement('a');
+  a.download=`${effectiveBank()}_slip_processed.png`;
+  a.href=document.getElementById('out-c').toDataURL('image/png');a.click();
 });
 
-resetBtn.addEventListener('click', () => {
-  currentImg = null; autoDetected = null;
-  drop.style.display = 'block';
-  caArea.style.display = 'none';
-  infoBox.style.display = 'none';
-  actions.style.display = 'none';
-  statusEl.style.display = 'none';
-  debugBar.classList.remove('show');
-  detectBadge.classList.remove('show');
-  dlBtn.disabled = true;
-  fileIn.value = '';
-  zonesChk.checked = false;
-  showZones = false;
-  window._detectConf = null;
+document.getElementById('reset-btn').addEventListener('click',()=>{
+  currentImg=null;autoDetected=null;
+  drop.style.display='block';
+  ['canvas-area','info-box','actions'].forEach(id=>{const el=document.getElementById(id);el.style.display='none';});
+  document.getElementById('status').style.display='none';
+  document.getElementById('debug-bar').classList.remove('show');
+  document.getElementById('detect-badge').classList.remove('show');
+  document.getElementById('adj-panel').classList.remove('show');
+  document.getElementById('dl-btn').disabled=true;fileIn.value='';
+  document.getElementById('show-zones').checked=false;showZones=false;window._detectConf=null;
+  sliderDefs.forEach(({id,key,val})=>{const sl=document.getElementById(id);sl.value=0;adj[key]=0;document.getElementById(val).textContent='0%';});
 });
 </script>
 </body>
