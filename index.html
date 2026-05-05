@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KBank SlipShield — Sender Blur</title>
+<title>SlipShield — Auto Bank Detection</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -23,7 +23,7 @@ body{
 }
 body::after{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulance type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
 }
 .wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:0 26px}
 
@@ -49,7 +49,7 @@ header{
 .hero{padding:44px 0 32px;text-align:center}
 .hero h1{font-size:clamp(1.8rem,3.6vw,2.8rem);font-weight:700;letter-spacing:-.5px;line-height:1.12}
 .hero h1 em{font-style:normal;color:var(--v3)}
-.hero p{color:var(--mist);margin-top:12px;max-width:500px;margin-inline:auto;font-size:.94rem;line-height:1.7}
+.hero p{color:var(--mist);margin-top:12px;max-width:520px;margin-inline:auto;font-size:.94rem;line-height:1.7}
 .tag-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
 .tag{font-size:.7rem;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--e);background:var(--surf);color:var(--mist)}
 .tag.hi{background:rgba(107,56,255,.15);border-color:var(--e2);color:var(--v3)}
@@ -146,19 +146,19 @@ label.btn{cursor:pointer}
 <header>
   <div class="brand">
     <div class="gem">🛡️</div>
-    <div class="brand-name">KBank <span>SlipShield</span></div>
+    <div class="brand-name">Slip<span>Shield</span></div>
   </div>
-  <span class="chip">SENDER BLUR · NO OCR</span>
+  <span class="chip">AUTO BANK DETECT · NO OCR</span>
 </header>
 
 <section class="hero">
-  <h1>เบลอชื่อ<em>ผู้โอน</em> KBank Slip</h1>
-  <p>ใช้ fixed layout positioning — เบลอเฉพาะชื่อผู้โอน (ผู้โอน) และแทนที่ QR code ด้วยโลโก้ของคุณ ไม่ใช้ OCR ทำงานใน browser ทั้งหมด</p>
+  <h1>เบลอชื่อ<em>ผู้โอน</em> อัตโนมัติ</h1>
+  <p>ตรวจจับธนาคารอัตโนมัติจาก dominant color — รองรับ KBank (เขียว) และ SCB (ม่วง) ปรับ layout เองตามธนาคาร ไม่ใช้ OCR</p>
   <div class="tag-row">
-    <span class="tag hi">🟩 KBank / K PLUS</span>
-    <span class="tag hi">เบลอ: ผู้โอน</span>
-    <span class="tag">ไม่แตะ: ผู้รับ</span>
-    <span class="tag">Fixed Layout</span>
+    <span class="tag hi">🟩 KBank Auto</span>
+    <span class="tag hi">🟣 SCB Auto</span>
+    <span class="tag">Color Detection</span>
+    <span class="tag">เบลอ: ผู้โอน</span>
     <span class="tag">No OCR</span>
   </div>
 </section>
@@ -175,8 +175,8 @@ label.btn{cursor:pointer}
 <!-- DROP ZONE -->
 <div id="drop">
   <div class="di">🧾</div>
-  <div class="dh">วาง KBank slip ที่นี่</div>
-  <div class="ds">หรือคลิกเพื่อเลือกไฟล์</div>
+  <div class="dh">วาง KBank หรือ SCB slip ที่นี่</div>
+  <div class="ds">ระบบจะตรวจจับธนาคารและปรับ layout อัตโนมัติ</div>
   <div class="fmts"><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span></div>
   <button class="btn-br" id="browse-btn">📂 เลือกไฟล์</button>
   <input type="file" id="file-in" accept="image/jpeg,image/png,image/webp">
@@ -188,13 +188,14 @@ label.btn{cursor:pointer}
 <!-- INFO CARDS -->
 <div id="info-box">
   <div class="ic"><span class="il">Image Size</span><span class="iv" id="inf-sz">—</span></div>
+  <div class="ic"><span class="il">Detected Bank</span><span class="iv p" id="inf-bank">—</span></div>
   <div class="ic"><span class="il">Sender Zone (BLURRED)</span><span class="iv a" id="inf-snd">—</span></div>
   <div class="ic"><span class="il">QR Zone (OVERLAY)</span><span class="iv p" id="inf-qr">—</span></div>
-  <div class="ic"><span class="il">Receiver Zone</span><span class="iv g" id="inf-rcv">NOT TOUCHED ✓</span></div>
+  <div class="ic"><span class="il">Receiver Zone</span><span class="iv g">NOT TOUCHED ✓</span></div>
   <label class="zt"><input type="checkbox" id="show-zones"> Show zones</label>
 </div>
 
-<!-- CANVAS AREA -->
+<!-- CANVAS -->
 <div id="canvas-area">
   <div class="panel">
     <div class="ph"><span class="pt"><span class="dot db"></span>ต้นฉบับ (Original)</span></div>
@@ -217,47 +218,65 @@ label.btn{cursor:pointer}
 
 </div>
 <script>
-/* ════════════════════════════════════════════
-   LAYOUT — KBank fixed percentages
-   BLUR:    sender (ผู้โอน) only
-   OVERLAY: QR code bottom-right
-   UNTOUCHED: receiver (ผู้รับ), all other areas
-════════════════════════════════════════════ */
-const LAYOUT = {
-  sender: { xP:.20, yP:.18, wP:.55, hP:.10 },
-  qr:     { xP:.68, yP:.60, wP:.25, hP:.25 },
+/* ══════════════════════════════════════════════════════
+   BANK LAYOUTS
+══════════════════════════════════════════════════════ */
+const LAYOUTS = {
+  kbank: {
+    label: 'KBank / K PLUS',
+    icon: '🟩',
+    sender: { xP:.20, yP:.18, wP:.55, hP:.10 },
+    qr:     { xP:.72, yP:.64, wP:.22, hP:.22 },
+    useCard: false,
+  },
+  scb: {
+    label: 'SCB / SCB EASY',
+    icon: '🟣',
+    card:   { xP:.05, yP:.15, wP:.90, hP:.70 },
+    sender: { xP:.20, yP:.20, wP:.60, hP:.10 }, // relative to card
+    qr:     { xP:.70, yP:.72, sP:.25 },         // relative to card - ขยับลงและขวา
+    useCard: true,
+  },
 };
 
-/* ────── STATE ────── */
-let overlayImg = null;
-let currentImg = null;
-let showZones  = false;
+/* ══════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════ */
+let overlayImg    = null;
+let currentImg    = null;
+let showZones     = false;
+let detectedBank  = null;
 
-/* ────── ELEMENTS ────── */
-const drop     = document.getElementById('drop');
-const fileIn   = document.getElementById('file-in');
-const browseBtn= document.getElementById('browse-btn');
-const statusEl = document.getElementById('status');
-const sTxt     = document.getElementById('s-txt');
-const caArea   = document.getElementById('canvas-area');
-const origC    = document.getElementById('orig-c');
-const outC     = document.getElementById('out-c');
-const origX    = origC.getContext('2d');
-const outX     = outC.getContext('2d');
-const infoBox  = document.getElementById('info-box');
-const actions  = document.getElementById('actions');
-const dlBtn    = document.getElementById('dl-btn');
-const resetBtn = document.getElementById('reset-btn');
-const ovThumb  = document.getElementById('ov-thumb');
-const ovUrl    = document.getElementById('ov-url');
-const ovFile   = document.getElementById('ov-file');
-const ovApply  = document.getElementById('ov-apply');
-const zonesChk = document.getElementById('show-zones');
-const infSz    = document.getElementById('inf-sz');
-const infSnd   = document.getElementById('inf-snd');
-const infQR    = document.getElementById('inf-qr');
+/* ══════════════════════════════════════════════════════
+   ELEMENTS
+══════════════════════════════════════════════════════ */
+const drop      = document.getElementById('drop');
+const fileIn    = document.getElementById('file-in');
+const browseBtn = document.getElementById('browse-btn');
+const statusEl  = document.getElementById('status');
+const sTxt      = document.getElementById('s-txt');
+const caArea    = document.getElementById('canvas-area');
+const origC     = document.getElementById('orig-c');
+const outC      = document.getElementById('out-c');
+const origX     = origC.getContext('2d');
+const outX      = outC.getContext('2d');
+const infoBox   = document.getElementById('info-box');
+const actions   = document.getElementById('actions');
+const dlBtn     = document.getElementById('dl-btn');
+const resetBtn  = document.getElementById('reset-btn');
+const ovThumb   = document.getElementById('ov-thumb');
+const ovUrl     = document.getElementById('ov-url');
+const ovFile    = document.getElementById('ov-file');
+const ovApply   = document.getElementById('ov-apply');
+const zonesChk  = document.getElementById('show-zones');
+const infSz     = document.getElementById('inf-sz');
+const infBank   = document.getElementById('inf-bank');
+const infSnd    = document.getElementById('inf-snd');
+const infQR     = document.getElementById('inf-qr');
 
-/* ────── OVERLAY SETUP ────── */
+/* ══════════════════════════════════════════════════════
+   OVERLAY LOADER
+══════════════════════════════════════════════════════ */
 function loadOverlay(src) {
   const img = new Image();
   img.crossOrigin = 'anonymous';
@@ -302,7 +321,9 @@ ovFile.addEventListener('change', () => {
   r.readAsDataURL(f);
 });
 
-/* ────── DRAG & DROP ────── */
+/* ══════════════════════════════════════════════════════
+   DRAG & DROP / FILE PICKER
+══════════════════════════════════════════════════════ */
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', e => {
@@ -314,7 +335,9 @@ drop.addEventListener('click', () => fileIn.click());
 browseBtn.addEventListener('click', e => { e.stopPropagation(); fileIn.click(); });
 fileIn.addEventListener('change', () => { if (fileIn.files[0]) loadSlip(fileIn.files[0]); });
 
-/* ────── LOAD ────── */
+/* ══════════════════════════════════════════════════════
+   LOAD SLIP
+══════════════════════════════════════════════════════ */
 function loadSlip(file) {
   const r = new FileReader();
   r.onload = e => {
@@ -325,6 +348,10 @@ function loadSlip(file) {
       origC.width = outC.width = W;
       origC.height = outC.height = H;
       origX.drawImage(img, 0, 0);
+      
+      // Detect bank
+      detectedBank = detectBank(origX, W, H);
+      
       render();
       showUI();
     };
@@ -333,56 +360,134 @@ function loadSlip(file) {
   r.readAsDataURL(file);
 }
 
-/* ────── RECTS ────── */
+/* ══════════════════════════════════════════════════════
+   BANK DETECTION — dominant color heuristic
+══════════════════════════════════════════════════════ */
+function detectBank(ctx, W, H) {
+  // Sample top 20% of image (logo area)
+  const sampleH = Math.floor(H * 0.2);
+  const id = ctx.getImageData(0, 0, W, sampleH);
+  const d = id.data;
+  
+  let greenScore = 0, purpleScore = 0;
+  const step = 8; // sample every 8th pixel for performance
+  
+  for (let i = 0; i < d.length; i += 4 * step) {
+    const r = d[i], g = d[i+1], b = d[i+2];
+    
+    // Green heuristic (KBank): G > R && G > B
+    if (g > r && g > b && g > 80) greenScore++;
+    
+    // Purple heuristic (SCB): B > G && R > G
+    if (b > g && r > g && (r + b) > 200) purpleScore++;
+  }
+  
+  // Return bank with higher score, fallback to kbank
+  if (purpleScore > greenScore && purpleScore > 50) return 'scb';
+  if (greenScore > 50) return 'kbank';
+  return 'kbank'; // default fallback
+}
+
+/* ══════════════════════════════════════════════════════
+   CLAMP
+══════════════════════════════════════════════════════ */
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-function senderRect(W, H) {
-  const x = Math.round(clamp(LAYOUT.sender.xP * W, 0, W));
-  const y = Math.round(clamp(LAYOUT.sender.yP * H, 0, H));
-  const w = Math.round(clamp(LAYOUT.sender.wP * W, 1, W - x));
-  const h = Math.round(clamp(LAYOUT.sender.hP * H, 1, H - y));
-  return { x, y, w, h };
+/* ══════════════════════════════════════════════════════
+   LAYOUT COMPUTATION
+══════════════════════════════════════════════════════ */
+function computeLayout(W, H, bank) {
+  const L = LAYOUTS[bank];
+  
+  if (L.useCard) {
+    // SCB: card-relative layout
+    const card = {
+      x: W * L.card.xP,
+      y: H * L.card.yP,
+      w: W * L.card.wP,
+      h: H * L.card.hP,
+    };
+    
+    const sender = {
+      x: clamp(card.x + card.w * 0.12, 0, W),
+      y: clamp(card.y + card.h * L.sender.yP, 0, H),
+      w: clamp(card.w * 0.88, 10, W),
+      h: clamp(card.h * 0.12, 8, H),
+    };
+    sender.w = Math.min(sender.w, card.x + card.w - sender.x);
+    sender.h = clamp(sender.h, 8, H - sender.y);
+    
+    const qrSize = card.w * L.qr.sP;
+    const qrX = card.x + card.w * L.qr.xP;
+    const qrY = card.y + card.h * L.qr.yP;
+    
+    // Fallback if overflow
+    const overflow = (qrX + qrSize > W * 0.99) || (qrY + qrSize > H * 0.99);
+    const qr = overflow
+      ? { x: W * 0.70, y: H * 0.70, w: W * 0.22, h: W * 0.22 }
+      : { x: qrX, y: qrY, w: qrSize, h: qrSize };
+    
+    qr.x = clamp(qr.x, 0, W - 10);
+    qr.y = clamp(qr.y, 0, H - 10);
+    qr.w = clamp(qr.w, 10, W - qr.x);
+    qr.h = clamp(qr.h, 10, H - qr.y);
+    
+    return { sender, qr };
+  } else {
+    // KBank: absolute layout
+    const sender = {
+      x: Math.round(clamp(L.sender.xP * W, 0, W)),
+      y: Math.round(clamp(L.sender.yP * H, 0, H)),
+      w: Math.round(clamp(L.sender.wP * W, 1, W)),
+      h: Math.round(clamp(L.sender.hP * H, 1, H)),
+    };
+    sender.w = clamp(sender.w, 1, W - sender.x);
+    sender.h = clamp(sender.h, 1, H - sender.y);
+    
+    const qr = {
+      x: Math.round(clamp(L.qr.xP * W, 0, W)),
+      y: Math.round(clamp(L.qr.yP * H, 0, H)),
+      w: Math.round(clamp(L.qr.wP * W, 1, W)),
+      h: Math.round(clamp(L.qr.hP * H, 1, H)),
+    };
+    qr.w = clamp(qr.w, 1, W - qr.x);
+    qr.h = clamp(qr.h, 1, H - qr.y);
+    
+    return { sender, qr };
+  }
 }
 
-function qrRect(W, H) {
-  const x = Math.round(clamp(LAYOUT.qr.xP * W, 0, W));
-  const y = Math.round(clamp(LAYOUT.qr.yP * H, 0, H));
-  const w = Math.round(clamp(LAYOUT.qr.wP * W, 1, W - x));
-  const h = Math.round(clamp(LAYOUT.qr.hP * H, 1, H - y));
-  return { x, y, w, h };
-}
-
-/* ────── RENDER ────── */
+/* ══════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════ */
 function render() {
-  if (!currentImg) return;
+  if (!currentImg || !detectedBank) return;
   const W = currentImg.naturalWidth, H = currentImg.naturalHeight;
   outX.drawImage(currentImg, 0, 0);
-
-  const snd = senderRect(W, H);
-  const qr  = qrRect(W, H);
-
-  /* BLUR sender only */
-  blurRect(outX, snd.x, snd.y, snd.w, snd.h, 26);
-
-  /* QR overlay — no blur */
+  
+  const { sender, qr } = computeLayout(W, H, detectedBank);
+  
+  blurRect(outX, sender.x, sender.y, sender.w, sender.h, 26);
   drawQROverlay(outX, qr);
-
-  /* optional zone outlines */
+  
   if (showZones) {
-    outline(outX, snd, '#f59e0b', 'ผู้โอน (BLURRED)');
-    outline(outX, qr,  '#3b82f6', 'QR (OVERLAY)');
+    outline(outX, sender, '#f59e0b', 'ผู้โอน (BLURRED)');
+    outline(outX, qr, '#3b82f6', 'QR (OVERLAY)');
   }
-
-  /* info */
-  infSz.textContent  = `${W} × ${H} px`;
-  infSnd.textContent = `(${snd.x}, ${snd.y}) ${snd.w}×${snd.h}`;
-  infQR.textContent  = `(${qr.x}, ${qr.y}) ${qr.w}×${qr.h}`;
+  
+  const L = LAYOUTS[detectedBank];
+  infSz.textContent = `${W} × ${H} px`;
+  infBank.textContent = `${L.icon} ${L.label}`;
+  infSnd.textContent = `(${Math.round(sender.x)},${Math.round(sender.y)}) ${Math.round(sender.w)}×${Math.round(sender.h)}`;
+  infQR.textContent = `(${Math.round(qr.x)},${Math.round(qr.y)}) ${Math.round(qr.w)}×${Math.round(qr.h)}`;
 }
 
-/* ────── TRIPLE-PASS BOX BLUR ────── */
+/* ══════════════════════════════════════════════════════
+   TRIPLE-PASS BOX BLUR
+══════════════════════════════════════════════════════ */
 function blurRect(ctx, x, y, w, h, rad) {
   x = Math.max(0, Math.round(x)); y = Math.max(0, Math.round(y));
-  w = Math.min(ctx.canvas.width  - x, Math.round(w));
+  w = Math.min(ctx.canvas.width - x, Math.round(w));
   h = Math.min(ctx.canvas.height - y, Math.round(h));
   if (w <= 0 || h <= 0) return;
   const id = ctx.getImageData(x, y, w, h);
@@ -414,61 +519,50 @@ function pass(id, rad) {
   }
 }
 
-/* ────── QR OVERLAY (subpixel-accurate, circular clip) ────── */
+/* ══════════════════════════════════════════════════════
+   QR OVERLAY — subpixel-accurate, circular clip
+══════════════════════════════════════════════════════ */
 function drawQROverlay(ctx, qr) {
-  const SCALE = 0.83;
-
-  // Subpixel-exact center — keep as float, never round
+  const SCALE = 0.85;
+  const offsetY = Math.min(qr.w, qr.h) * 0.30;
   const cx = qr.x + qr.w * 0.5;
-  const cy = qr.y + qr.h * 0.5;
+  const cy = qr.y + qr.h * 0.5 + offsetY;
   const cr = Math.min(qr.w, qr.h) * 0.5;
-
+  
   ctx.save();
-
-  // High-quality resampling for overlay image
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-
-  // 1. White circle background — subpixel arc
+  
   ctx.beginPath();
   ctx.arc(cx, cy, cr, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,255,255,0.97)';
   ctx.fill();
-
-  // 2. Circular clip path (re-declare after fill so clip is fresh)
+  
   ctx.beginPath();
   ctx.arc(cx, cy, cr, 0, Math.PI * 2);
   ctx.clip();
-
-  // 3. Translate to exact center, draw image at (-dw/2, -dh/2)
-  //    This guarantees zero rounding error from coordinate arithmetic
+  
   if (overlayImg) {
-    const iw = overlayImg.naturalWidth;
-    const ih = overlayImg.naturalHeight;
-    const ar = iw / ih;
-
-    // Fit inside scaled circle: longest side = dia
+    const ar = overlayImg.naturalWidth / overlayImg.naturalHeight;
     const dia = cr * 2 * SCALE;
     let dw, dh;
     if (ar >= 1) { dw = dia; dh = dia / ar; }
-    else         { dh = dia; dw = dia * ar; }
-
-    // Translate to center, then draw at exact −½ offsets (float, no rounding)
+    else { dh = dia; dw = dia * ar; }
     ctx.translate(cx, cy);
     ctx.drawImage(overlayImg, -dw * 0.5, -dh * 0.5, dw, dh);
   } else {
     ctx.translate(cx, cy);
     ctx.fillStyle = '#6b38ff';
     ctx.font = `bold ${cr * 0.7}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('IX', 0, 0);
   }
-
-  ctx.restore(); // resets translate + clip + imageSmoothingQuality
+  ctx.restore();
 }
 
-/* ────── ZONE OUTLINE ────── */
+/* ══════════════════════════════════════════════════════
+   ZONE OUTLINE
+══════════════════════════════════════════════════════ */
 function outline(ctx, r, color, label) {
   ctx.save();
   ctx.strokeStyle=color; ctx.lineWidth=Math.max(2,r.h*.04);
@@ -480,7 +574,9 @@ function outline(ctx, r, color, label) {
   ctx.restore();
 }
 
-/* ────── SHOW UI ────── */
+/* ══════════════════════════════════════════════════════
+   SHOW UI
+══════════════════════════════════════════════════════ */
 function showUI() {
   drop.style.display='none';
   caArea.style.display='flex'; caArea.classList.add('fi');
@@ -488,20 +584,24 @@ function showUI() {
   actions.style.display='flex';
   dlBtn.disabled=false;
   statusEl.style.display='flex'; statusEl.className='ok';
-  sTxt.textContent='✅ เสร็จสิ้น — ชื่อผู้โอนถูกเบลอ, QR ถูกแทนที่, ชื่อผู้รับไม่ถูกแตะ';
+  sTxt.textContent=`✅ เสร็จสิ้น — ${LAYOUTS[detectedBank].label}: ชื่อผู้โอนถูกเบลอ, QR ถูกแทนที่`;
 }
 
-/* ────── ZONE TOGGLE ────── */
+/* ══════════════════════════════════════════════════════
+   ZONE TOGGLE
+══════════════════════════════════════════════════════ */
 zonesChk.addEventListener('change', () => { showZones=zonesChk.checked; if(currentImg) render(); });
 
-/* ────── DOWNLOAD / RESET ────── */
+/* ══════════════════════════════════════════════════════
+   DOWNLOAD / RESET
+══════════════════════════════════════════════════════ */
 dlBtn.addEventListener('click', () => {
   const a=document.createElement('a');
-  a.download='kbank_slip_processed.png';
+  a.download=`${detectedBank}_slip_processed.png`;
   a.href=outC.toDataURL('image/png'); a.click();
 });
 resetBtn.addEventListener('click', () => {
-  currentImg=null;
+  currentImg=null; detectedBank=null;
   drop.style.display='block';
   caArea.style.display='none';
   infoBox.style.display='none';
