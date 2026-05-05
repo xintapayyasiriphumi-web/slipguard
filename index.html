@@ -72,8 +72,8 @@ label.btn{cursor:pointer}
 .zt{display:inline-flex;align-items:center;gap:7px;font-size:.79rem;color:var(--mist);cursor:pointer;user-select:none;margin-left:auto}
 .zt input{accent-color:var(--v2);cursor:pointer}
 /* CANVAS AREA */
-#canvas-area{display:none;gap:16px;margin-bottom:20px}
-.panel{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--e);border-radius:var(--r);display:flex;flex-direction:column;overflow:hidden}
+#canvas-area{display:none;gap:16px;margin-bottom:20px;align-items:flex-start}
+.panel{flex:1;min-width:0;max-width:50%;background:var(--bg2);border:1px solid var(--e);border-radius:var(--r);display:flex;flex-direction:column;overflow:hidden}
 .ph{padding:9px 14px;border-bottom:1px solid var(--e);background:var(--surf);display:flex;align-items:center;justify-content:space-between}
 .pt{font-size:.7rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mist);display:flex;align-items:center;gap:6px}
 .pt-hint{font-size:.67rem;color:var(--v3);font-weight:500;font-family:'DM Mono',monospace}
@@ -81,8 +81,10 @@ label.btn{cursor:pointer}
 .db{background:#3b82f6}.dp{background:var(--v2)}
 .cw{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;min-height:200px;position:relative}
 /* Interactive canvas wrapper */
-.canvas-wrap{position:relative;display:inline-block;line-height:0}
-.canvas-wrap canvas{max-width:100%;max-height:560px;border-radius:7px;display:block}
+.canvas-wrap{position:relative;display:inline-block;line-height:0;max-width:100%}
+.canvas-wrap canvas{max-width:100%;max-height:520px;border-radius:7px;display:block}
+#orig-c{max-width:100%;max-height:520px;border-radius:7px;display:block}
+@media(max-width:720px){#canvas-area{flex-direction:column}.panel{max-width:100%}}
 /* Drag overlays (absolutely positioned on top of canvas) */
 .drag-box{position:absolute;border:2px solid;border-radius:4px;cursor:move;user-select:none;touch-action:none}
 .drag-box.sender{border-color:var(--amber);background:rgba(245,158,11,.08)}
@@ -100,7 +102,6 @@ label.btn{cursor:pointer}
 .sender .rh{background:var(--amber)}
 .qr .rh{background:#60a5fa}
 #actions{display:none;gap:10px;margin-bottom:36px;flex-wrap:wrap}
-@media(max-width:720px){#canvas-area{flex-direction:column}}
 .fi{animation:fi .35s ease forwards}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
