@@ -688,6 +688,21 @@ function renderSlipToCanvas(slip){
   tx.drawImage(slip.img,0,0);
   blurRect(tx,slip.senderRect.x,slip.senderRect.y,slip.senderRect.w,slip.senderRect.h,28);
   drawQROverlay(tx,slip.qrRect);
+  // Watermark
+  const W=tc.width,H=tc.height;
+  const fs=Math.max(18,Math.round(W*0.028));
+  const txt='SlipShield by INSIDEX';
+  const pad=Math.round(fs*0.5);
+  tx.save();
+  tx.font=`600 ${fs}px 'IBM Plex Sans Thai',sans-serif`;
+  tx.textAlign='right';tx.textBaseline='bottom';
+  const tw=tx.measureText(txt).width;
+  // Shadow for readability
+  tx.shadowColor='rgba(0,0,0,0.5)';tx.shadowBlur=6;
+  tx.fillStyle='rgba(255,255,255,0.55)';
+  tx.fillText(txt,W-pad,H-pad);
+  tx.shadowBlur=0;
+  tx.restore();
   return tc;
 }
 
