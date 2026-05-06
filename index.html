@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SlipShield — Batch · Drag to Adjust</title>
+<title>SlipShieldX — Batch · Drag to Adjust</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#06060f;--bg2:#0b0b1d;--surf:#111128;--surf2:#191936;--e:rgba(100,60,255,.15);--e2:rgba(100,60,255,.30);--v:#6b38ff;--v2:#8b5cf6;--v3:#c4b5fd;--glow:rgba(107,56,255,.42);--snow:#ede9ff;--mist:#786fa8;--fog:#383460;--jade:#10b981;--amber:#f59e0b;--r:13px}
+:root{--bg:#06060f;--bg2:#0b0b1d;--surf:#111128;--surf2:#191936;--e:rgba(100,60,255,.15);--e2:rgba(100,60,255,.30);--v:#6b38ff;--v2:#8b5cf6;--v3:#c4b5fd;--glow:rgba(107,56,255,.42);--snow:#ede9ff;--mist:#786fa8;--fog:#383460;--jade:#10b981;--amber:#f59e0b;--red:#f87171;--r:13px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--snow);min-height:100vh;background-image:radial-gradient(ellipse 60% 40% at 12% 0%,rgba(107,56,255,.10) 0%,transparent 60%),radial-gradient(ellipse 50% 30% at 88% 100%,rgba(139,92,246,.07) 0%,transparent 55%)}
 .wrap{max-width:1400px;margin:0 auto;padding:0 24px}
@@ -71,19 +71,6 @@ label.btn{cursor:pointer}
 .thumb-bank-sel{width:100%;background:var(--surf);border:1px solid var(--e);color:var(--snow);border-radius:5px;padding:3px 4px;font-size:.64rem;font-family:'IBM Plex Sans Thai',sans-serif;cursor:pointer;outline:none;margin-top:4px;display:block}
 .thumb-bank-sel:focus{border-color:var(--e2)}
 .slip-conf{font-size:.6rem;color:var(--mist);font-family:'DM Mono',monospace;text-align:right;margin-top:2px}
-/* BANK CONFIRM MODAL */
-#bank-confirm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-#bank-confirm.show{display:flex}
-.bc-box{background:var(--surf);border:1px solid var(--e2);border-radius:16px;padding:24px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.bc-title{font-size:1rem;font-weight:700;margin-bottom:6px}
-.bc-sub{font-size:.83rem;color:var(--mist);margin-bottom:16px;line-height:1.5}
-.bc-detected{display:flex;align-items:center;gap:8px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:.85rem}
-.bc-detected strong{color:var(--jade)}
-.bc-banks{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
-.bc-btn{padding:8px 6px;border-radius:8px;border:1px solid var(--e);background:var(--surf2);color:var(--mist);font-size:.75rem;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans Thai',sans-serif;transition:all .17s;text-align:center}
-.bc-btn:hover{border-color:var(--e2);color:var(--snow)}
-.bc-btn.selected{background:rgba(107,56,255,.2);border-color:var(--v2);color:var(--v3)}
-.bc-footer{display:flex;gap:8px;justify-content:flex-end}
 /* EDITOR */
 #editor-area{display:none;margin-bottom:20px}
 #editor-area.show{display:block}
@@ -107,9 +94,11 @@ label.btn{cursor:pointer}
 .drag-box{position:absolute;border:2px solid;border-radius:4px;cursor:move;user-select:none;touch-action:none}
 .drag-box.sender{border-color:var(--amber);background:rgba(245,158,11,.07)}
 .drag-box.qr-box{border-color:#60a5fa;background:rgba(96,165,250,.07)}
+.drag-box.ref-box{border-color:var(--red);background:rgba(248,113,113,.07)}
 .drag-label{position:absolute;top:-20px;left:0;font-size:.62rem;font-weight:700;font-family:'DM Mono',monospace;padding:1px 6px;border-radius:3px;white-space:nowrap;pointer-events:none}
 .sender .drag-label{background:var(--amber);color:#000}
 .qr-box .drag-label{background:#60a5fa;color:#000}
+.ref-box .drag-label{background:var(--red);color:#000}
 .rh{position:absolute;width:10px;height:10px;border-radius:2px}
 .rh-br{bottom:-5px;right:-5px;cursor:se-resize}
 .rh-bl{bottom:-5px;left:-5px;cursor:sw-resize}
@@ -117,6 +106,7 @@ label.btn{cursor:pointer}
 .rh-tl{top:-5px;left:-5px;cursor:nw-resize}
 .sender .rh{background:var(--amber)}
 .qr-box .rh{background:#60a5fa}
+.ref-box .rh{background:var(--red)}
 /* HINT */
 .hint-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;margin-bottom:12px;font-size:.79rem;background:rgba(107,56,255,.08);border:1px solid var(--e2);color:var(--v3)}
 /* INFO ROW */
@@ -124,7 +114,7 @@ label.btn{cursor:pointer}
 .ic{background:var(--surf);border:1px solid var(--e);border-radius:8px;padding:9px 13px;display:flex;flex-direction:column;gap:3px}
 .il{font-size:.64rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mist)}
 .iv{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--snow)}
-.iv.g{color:var(--jade)}.iv.p{color:var(--v3)}.iv.a{color:var(--amber)}
+.iv.g{color:var(--jade)}.iv.p{color:var(--v3)}.iv.a{color:var(--amber)}.iv.r{color:var(--red)}
 /* ACTIONS */
 #actions-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:36px}
 #actions-bar.show{display:flex}
@@ -152,7 +142,7 @@ label.btn{cursor:pointer}
 
 <section class="hero">
   <h1>เบลอชื่อ<em>ผู้โอน</em> — Batch Mode</h1>
-  <p>อัปโหลดหลายรูปพร้อมกัน · Auto detect ธนาคาร → เปลี่ยนได้ที่ thumbnail · ลากปรับ Blur &amp; QR · Download ZIP</p>
+  <p>อัปโหลดหลายรูปพร้อมกัน · Auto detect ธนาคาร → เปลี่ยนได้ที่ thumbnail · ลากปรับ Blur &amp; QR &amp; เลขรายการ · Download ZIP</p>
   <div class="tag-row">
     <span class="tag hi">🟩 KBank</span><span class="tag hi">🟣 SCB</span><span class="tag hi">🔴 TrueMoney</span>
     <span class="tag hi">🔵 Krungthai</span><span class="tag hi">🟡 Krungsri</span><span class="tag hi">🟪 KKP</span>
@@ -173,7 +163,7 @@ label.btn{cursor:pointer}
 <div id="drop">
   <div class="di">🧾</div>
   <div class="dh">วางหลายรูปพร้อมกันได้เลย</div>
-  <div class="ds">Auto detect ธนาคาร → เปลี่ยนได้ที่ thumbnail → ลากปรับ Blur &amp; QR → Download ZIP</div>
+  <div class="ds">Auto detect ธนาคาร → เปลี่ยนได้ที่ thumbnail → ลากปรับ Blur &amp; QR &amp; เลขรายการ → Download ZIP</div>
   <div class="fmts"><span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span></div>
   <button class="btn-br" id="browse-btn">📂 เลือกไฟล์ (หลายรูปได้)</button>
   <input type="file" id="file-in" accept="image/jpeg,image/png,image/webp" multiple>
@@ -224,7 +214,12 @@ label.btn{cursor:pointer}
 
   <div class="hint-bar">
     <span>💡</span>
-    <span><strong style="color:var(--amber)">กรอบส้ม</strong> = ลากย้าย Blur · <strong style="color:#60a5fa">กรอบน้ำเงิน</strong> = ลากย้าย QR · ดึงมุมเพื่อ resize · <kbd style="background:var(--surf2);border:1px solid var(--e);border-radius:3px;padding:0 5px;font-size:.73rem">R</kbd> = reset รูปนี้</span>
+    <span>
+      <strong style="color:var(--amber)">กรอบส้ม</strong> = เบลอชื่อผู้โอน ·
+      <strong style="color:#60a5fa">กรอบน้ำเงิน</strong> = QR Overlay ·
+      <strong style="color:var(--red)">กรอบแดง</strong> = เบลอเลขที่รายการ ·
+      ดึงมุมเพื่อ resize · <kbd style="background:var(--surf2);border:1px solid var(--e);border-radius:3px;padding:0 5px;font-size:.73rem">R</kbd> = reset รูปนี้
+    </span>
   </div>
 
   <div class="info-row" id="info-row">
@@ -233,6 +228,7 @@ label.btn{cursor:pointer}
     <div class="ic"><span class="il">Bank</span><span class="iv p" id="inf-bank">—</span></div>
     <div class="ic"><span class="il">Confidence</span><span class="iv a" id="inf-conf">—</span></div>
     <div class="ic"><span class="il">Sender (Blur)</span><span class="iv a" id="inf-snd">—</span></div>
+    <div class="ic"><span class="il">Ref No. (Blur)</span><span class="iv r" id="inf-ref">—</span></div>
     <div class="ic"><span class="il">QR (Overlay)</span><span class="iv p" id="inf-qr">—</span></div>
     <div class="ic"><span class="il">Receiver</span><span class="iv g">SAFE ✓</span></div>
   </div>
@@ -250,13 +246,15 @@ label.btn{cursor:pointer}
       <div class="ecw" id="proc-ecw">
         <div class="cwrap" id="cwrap">
           <canvas id="out-c"></canvas>
+          <!-- Sender blur box -->
           <div class="drag-box sender" id="box-sender">
-            <span class="drag-label">🟧 Blur</span>
+            <span class="drag-label">🟧 Blur ชื่อ</span>
             <div class="rh rh-br" data-box="sender" data-corner="br"></div>
             <div class="rh rh-bl" data-box="sender" data-corner="bl"></div>
             <div class="rh rh-tr" data-box="sender" data-corner="tr"></div>
             <div class="rh rh-tl" data-box="sender" data-corner="tl"></div>
           </div>
+          <!-- QR overlay box -->
           <div class="drag-box qr-box" id="box-qr">
             <span class="drag-label">🟦 QR</span>
             <div class="rh rh-br" data-box="qr" data-corner="br"></div>
@@ -264,13 +262,19 @@ label.btn{cursor:pointer}
             <div class="rh rh-tr" data-box="qr" data-corner="tr"></div>
             <div class="rh rh-tl" data-box="qr" data-corner="tl"></div>
           </div>
+          <!-- Ref number blur box -->
+          <div class="drag-box ref-box" id="box-ref">
+            <span class="drag-label">🟥 Blur เลขรายการ</span>
+            <div class="rh rh-br" data-box="ref" data-corner="br"></div>
+            <div class="rh rh-bl" data-box="ref" data-corner="bl"></div>
+            <div class="rh rh-tr" data-box="ref" data-corner="tr"></div>
+            <div class="rh rh-tl" data-box="ref" data-corner="tl"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<!-- BANK CONFIRM MODAL (ปิดใช้งาน — ใช้ inline selector แทน) -->
 
 <!-- ACTIONS BAR -->
 <div id="actions-bar">
@@ -282,37 +286,63 @@ label.btn{cursor:pointer}
 <script>
 /* ══ LAYOUTS ══ */
 const LAYOUTS={
-  kbank:{label:'KBank / K PLUS',icon:'🟩',sender:{xP:.18,yP:.185,wP:.58,hP:.095},qr:{xP:.68,yP:.635,wP:.26,hP:.26}},
-  scb:{label:'SCB / SCB EASY',icon:'🟣',sender:{xP:.20,yP:.335,wP:.58,hP:.095},qr:{xP:.62,yP:.65,wP:.30,hP:.30}},
-  truemoney:{label:'TrueMoney Wallet',icon:'🔴',sender:{xP:.05,yP:.295,wP:.65,hP:.085},qr:{xP:.68,yP:.555,wP:.26,hP:.26}},
-  krungthai:{label:'Krungthai / KTB',icon:'🔵',sender:{xP:.05,yP:.335,wP:.62,hP:.095},qr:{xP:.68,yP:.135,wP:.26,hP:.26}},
-  krungsri:{label:'Krungsri / BAY',icon:'🟡',sender:{xP:.28,yP:.155,wP:.62,hP:.08},qr:{xP:.65,yP:.385,wP:.28,hP:.28}},
-  kkp:{label:'KKP Better',icon:'🟪',sender:{xP:.13,yP:.415,wP:.70,hP:.095},qr:{xP:.72,yP:.745,wP:.22,hP:.22}},
+  kbank:{
+    label:'KBank / K PLUS',icon:'🟩',
+    sender:{xP:.18,yP:.185,wP:.58,hP:.095},
+    qr:{xP:.68,yP:.635,wP:.26,hP:.26},
+    ref:{xP:.05,yP:.50,wP:.55,hP:.065}
+  },
+  scb:{
+    label:'SCB / SCB EASY',icon:'🟣',
+    sender:{xP:.20,yP:.335,wP:.58,hP:.095},
+    qr:{xP:.62,yP:.65,wP:.30,hP:.30},
+    ref:{xP:.05,yP:.53,wP:.55,hP:.065}
+  },
+  truemoney:{
+    label:'TrueMoney Wallet',icon:'🔴',
+    sender:{xP:.05,yP:.295,wP:.65,hP:.085},
+    qr:{xP:.68,yP:.555,wP:.26,hP:.26},
+    ref:{xP:.05,yP:.46,wP:.60,hP:.065}
+  },
+  krungthai:{
+    label:'Krungthai / KTB',icon:'🔵',
+    sender:{xP:.05,yP:.335,wP:.62,hP:.095},
+    qr:{xP:.68,yP:.135,wP:.26,hP:.26},
+    ref:{xP:.05,yP:.53,wP:.55,hP:.065}
+  },
+  krungsri:{
+    label:'Krungsri / BAY',icon:'🟡',
+    sender:{xP:.28,yP:.155,wP:.62,hP:.08},
+    qr:{xP:.65,yP:.385,wP:.28,hP:.28},
+    ref:{xP:.05,yP:.42,wP:.55,hP:.065}
+  },
+  kkp:{
+    label:'KKP Better',icon:'🟪',
+    sender:{xP:.13,yP:.415,wP:.70,hP:.095},
+    qr:{xP:.72,yP:.745,wP:.22,hP:.22},
+    ref:{xP:.05,yP:.55,wP:.55,hP:.065}
+  },
 };
 
 /* ══ STATE ══ */
 let overlayImg=null;
-let slips=[];           // array of slip objects
-let activeIdx=-1;       // currently editing index
+let slips=[];
+let activeIdx=-1;
 let showZones=false;
 let dragState=null;
-let confirmQueue=[]; // ไม่ใช้แล้ว เก็บไว้ไม่ให้ error
-
-/* ══ SLIP OBJECT structure:
-  { file, img, name, bank, autoBank, conf, senderRect, qrRect, done }
-══ */
 
 /* ══ ELEMENTS ══ */
 const drop=document.getElementById('drop'),fileIn=document.getElementById('file-in');
 const origC=document.getElementById('orig-c'),outC=document.getElementById('out-c');
 const origX=origC.getContext('2d'),outX=outC.getContext('2d');
 const cwrap=document.getElementById('cwrap');
-const boxSender=document.getElementById('box-sender'),boxQR=document.getElementById('box-qr');
+const boxSender=document.getElementById('box-sender');
+const boxQR=document.getElementById('box-qr');
+const boxRef=document.getElementById('box-ref');
 const slipGrid=document.getElementById('slip-grid');
 const editorArea=document.getElementById('editor-area');
 const batchToolbar=document.getElementById('batch-toolbar');
 const actionsBar=document.getElementById('actions-bar');
-const bankConfirm=null; // modal ถูกลบออกแล้ว ใช้ inline selector แทน
 
 /* ══ OVERLAY ══ */
 function makeFallback(){
@@ -354,7 +384,7 @@ function addFiles(files){
   actionsBar.classList.add('show');
 
   arr.forEach(f=>{
-    const slip={file:f,img:null,name:f.name,bank:null,autoBank:null,conf:0,senderRect:null,qrRect:null,done:false};
+    const slip={file:f,img:null,name:f.name,bank:null,autoBank:null,conf:0,senderRect:null,qrRect:null,refRect:null,done:false};
     slips.push(slip);
     const idx=slips.length-1;
     loadSlipImage(slip,idx);
@@ -368,7 +398,6 @@ function loadSlipImage(slip,idx){
     const img=new Image();
     img.onload=()=>{
       slip.img=img;
-      // auto detect และ assign ทันที ไม่ต้อง confirm
       const tmp=document.createElement('canvas');
       tmp.width=img.naturalWidth;tmp.height=img.naturalHeight;
       tmp.getContext('2d').drawImage(img,0,0);
@@ -379,7 +408,6 @@ function loadSlipImage(slip,idx){
       updateThumb(idx);
       updateBatchCount();
       updateGrid();
-      // activate first slip
       if(activeIdx<0)setActive(idx);
     };
     img.src=e.target.result;
@@ -387,14 +415,15 @@ function loadSlipImage(slip,idx){
   rd.readAsDataURL(slip.file);
 }
 
-
-
 /* ══ INIT RECTS ══ */
 function initSlipRects(slip){
   const L=LAYOUTS[slip.bank],W=slip.img.naturalWidth,H=slip.img.naturalHeight;
   slip.senderRect={x:Math.round(L.sender.xP*W),y:Math.round(L.sender.yP*H),w:Math.round(L.sender.wP*W),h:Math.round(L.sender.hP*H)};
   slip.qrRect={x:Math.round(L.qr.xP*W),y:Math.round(L.qr.yP*H),w:Math.round(L.qr.wP*W),h:Math.round(L.qr.hP*H)};
-  clampRect(slip.senderRect,W,H);clampRect(slip.qrRect,W,H);
+  slip.refRect={x:Math.round(L.ref.xP*W),y:Math.round(L.ref.yP*H),w:Math.round(L.ref.wP*W),h:Math.round(L.ref.hP*H)};
+  clampRect(slip.senderRect,W,H);
+  clampRect(slip.qrRect,W,H);
+  clampRect(slip.refRect,W,H);
 }
 function clampRect(r,W,H){
   r.w=Math.max(10,r.w);r.h=Math.max(10,r.h);
@@ -405,7 +434,6 @@ function clampRect(r,W,H){
 function setActive(idx){
   activeIdx=idx;
   const slip=slips[idx];
-  // draw original
   origC.width=slip.img.naturalWidth;origC.height=slip.img.naturalHeight;
   outC.width=slip.img.naturalWidth;outC.height=slip.img.naturalHeight;
   origX.drawImage(slip.img,0,0);
@@ -413,9 +441,7 @@ function setActive(idx){
   updateEditorBankButtons();
   updateEditorNav();
   updateInfoRow();
-  // highlight in grid
   document.querySelectorAll('.slip-thumb').forEach((el,i)=>el.classList.toggle('active',i===idx));
-  // update drag boxes after canvas renders
   requestAnimationFrame(()=>requestAnimationFrame(()=>updateDragBoxes()));
 }
 
@@ -426,12 +452,16 @@ function renderActive(){
   const W=slip.img.naturalWidth,H=slip.img.naturalHeight;
   outX.clearRect(0,0,W,H);outX.drawImage(slip.img,0,0);
   blurRect(outX,slip.senderRect.x,slip.senderRect.y,slip.senderRect.w,slip.senderRect.h,28);
+  blurRect(outX,slip.refRect.x,slip.refRect.y,slip.refRect.w,slip.refRect.h,28);
   drawQROverlay(outX,slip.qrRect);
-  if(showZones){outline(outX,slip.senderRect,'#f59e0b','SENDER');outline(outX,slip.qrRect,'#60a5fa','QR');}
+  if(showZones){
+    outline(outX,slip.senderRect,'#f59e0b','SENDER');
+    outline(outX,slip.refRect,'#f87171','REF NO.');
+    outline(outX,slip.qrRect,'#60a5fa','QR');
+  }
   slip.done=true;
   updateInfoRow();
   updateDragBoxes();
-  // mark thumb done
   updateThumb(activeIdx);
   checkAllDone();
 }
@@ -481,7 +511,6 @@ function updateGrid(){
   });
 }
 
-
 function updateBatchCount(){
   document.getElementById('batch-count').textContent=`${slips.length} รูป`;
 }
@@ -506,7 +535,7 @@ function removeSlip(i){
   if(slips[activeIdx]&&slips[activeIdx].bank)setActive(activeIdx);
 }
 function clearAll(){
-  slips=[];activeIdx=-1;confirmQueue=[];
+  slips=[];activeIdx=-1;
   slipGrid.innerHTML='';slipGrid.classList.remove('show');
   batchToolbar.classList.remove('show');editorArea.classList.remove('show');actionsBar.classList.remove('show');
   drop.style.display='block';updateBatchCount();
@@ -545,6 +574,7 @@ function updateInfoRow(){
   document.getElementById('inf-bank').textContent=`${LAYOUTS[slip.bank].icon} ${LAYOUTS[slip.bank].label}`;
   document.getElementById('inf-conf').textContent=`${slip.conf}%`;
   if(slip.senderRect)document.getElementById('inf-snd').textContent=`(${slip.senderRect.x},${slip.senderRect.y}) ${slip.senderRect.w}×${slip.senderRect.h}`;
+  if(slip.refRect)document.getElementById('inf-ref').textContent=`(${slip.refRect.x},${slip.refRect.y}) ${slip.refRect.w}×${slip.refRect.h}`;
   if(slip.qrRect)document.getElementById('inf-qr').textContent=`(${slip.qrRect.x},${slip.qrRect.y}) ${slip.qrRect.w}×${slip.qrRect.h}`;
 }
 
@@ -559,6 +589,7 @@ function updateDragBoxes(){
   const{sx,sy}=canvasScale();
   posBox(boxSender,slip.senderRect,sx,sy);
   posBox(boxQR,slip.qrRect,sx,sy);
+  posBox(boxRef,slip.refRect,sx,sy);
 }
 function posBox(el,r,sx,sy){
   el.style.left=Math.round(r.x*sx)+'px';el.style.top=Math.round(r.y*sy)+'px';
@@ -575,14 +606,14 @@ function startDrag(e,box,corner){
   e.preventDefault();e.stopPropagation();
   if(activeIdx<0)return;
   const slip=slips[activeIdx];
-  const sr=box==='sender'?{...slip.senderRect}:{...slip.qrRect};
+  const sr=box==='sender'?{...slip.senderRect}:box==='qr'?{...slip.qrRect}:{...slip.refRect};
   const pos=getEPos(e);
   dragState={box,corner,startX:pos.x,startY:pos.y,startRect:sr};
   document.body.style.userSelect='none';
 }
 
-[boxSender,boxQR].forEach(el=>{
-  const box=el===boxSender?'sender':'qr';
+[boxSender,boxQR,boxRef].forEach(el=>{
+  const box=el===boxSender?'sender':el===boxQR?'qr':'ref';
   el.addEventListener('mousedown',e=>{if(e.target.classList.contains('rh'))return;startDrag(e,box,null);});
   el.addEventListener('touchstart',e=>{if(e.target.classList.contains('rh'))return;startDrag(e,box,null);},{passive:false});
 });
@@ -600,7 +631,7 @@ function onMove(e){
   const pos=getEPos(e);
   const dx=(pos.x-dragState.startX)/sx,dy=(pos.y-dragState.startY)/sy;
   const sr=dragState.startRect;
-  const r=dragState.box==='sender'?slip.senderRect:slip.qrRect;
+  const r=dragState.box==='sender'?slip.senderRect:dragState.box==='qr'?slip.qrRect:slip.refRect;
   if(!dragState.corner){
     r.x=Math.round(clamp(sr.x+dx,0,W-r.w));r.y=Math.round(clamp(sr.y+dy,0,H-r.h));
   } else {
@@ -687,6 +718,7 @@ function renderSlipToCanvas(slip){
   const tx=tc.getContext('2d');
   tx.drawImage(slip.img,0,0);
   blurRect(tx,slip.senderRect.x,slip.senderRect.y,slip.senderRect.w,slip.senderRect.h,28);
+  blurRect(tx,slip.refRect.x,slip.refRect.y,slip.refRect.w,slip.refRect.h,28);
   drawQROverlay(tx,slip.qrRect);
   // Watermark
   const W=tc.width,H=tc.height;
@@ -696,8 +728,6 @@ function renderSlipToCanvas(slip){
   tx.save();
   tx.font=`600 ${fs}px 'IBM Plex Sans Thai',sans-serif`;
   tx.textAlign='right';tx.textBaseline='bottom';
-  const tw=tx.measureText(txt).width;
-  // Shadow for readability
   tx.shadowColor='rgba(0,0,0,0.5)';tx.shadowBlur=6;
   tx.fillStyle='rgba(255,255,255,0.55)';
   tx.fillText(txt,W-pad,H-pad);
@@ -723,7 +753,6 @@ async function downloadAllZip(){
   const progLabel=document.getElementById('prog-label');
   progWrap.classList.add('show');
 
-  // load JSZip from CDN
   if(!window.JSZip){
     progLabel.textContent='โหลด JSZip…';
     await new Promise((res,rej)=>{
